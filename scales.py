@@ -4,9 +4,11 @@ window = tkinter.Tk()  # create window
 
 # define music notes
 notes = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
+intervals = [2, 2, 1, 2, 2, 2, 1]
+scale = []
 
 # define c major scale
-scale_c_major = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+# scale_c_major = get_scale('C')['C', 'D', 'E', 'F', 'G', 'A', 'B']
 # whole/half      w,   w,   h,   w,   w,   w,   h
 # tone/semitone   T,   T,   S,   T,   T,   T,   S
 #                 2,   2,   1,   2,   2,   2,   1
@@ -15,14 +17,50 @@ scale_c_major = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
 fret_marking = [0, 3, 5, 7, 9, 12, 15, 17, 19, 21]
 
 fret_spacing = 25  # how far apart to draw notes (horizontal)
-string_spacing = 20  # how far apart to draw string (vertical)
+string_spacing = 20  # how far apart to draw strings (vertical)
+
+
+# generate major scale
+def get_scale(root):
+    root = root.upper()
+    new_scale = []
+    note = notes.index(root)
+    for x in range(len(intervals)):
+        offset = intervals[x % len(intervals)]
+        new_scale.append(notes[note % len(notes)])
+        note += offset
+
+    return new_scale
+
+
+# change current operating scale
+def change_scale(scale_tonic_note):
+    # change scale
+    global scale
+    scale = get_scale(scale_tonic_note)
+
+    # refresh options for root to be notes in new scale
+    previous_root = selectedRoot.get()
+    optionMenuRoot["menu"].delete(0, 'end')
+    for n in scale:
+        optionMenuRoot['menu'].add_command(label=n, command=lambda v=n: draw_fretboard(v))
+
+    if previous_root in scale:
+        # print(previous_root.get() + ' in new scale')
+        selectedRoot.set(previous_root)
+    else:
+        print('reset root to first note in scale')
+        selectedRoot.set(scale[0])
+
+    # update fretboard
+    draw_fretboard(selectedRoot.get())
 
 
 # create triad cord
 def get_triad(root):
-    note_root  = scale_c_major[(root + 0) % len(scale_c_major)]
-    note_third = scale_c_major[(root + 2) % len(scale_c_major)]
-    note_fifth = scale_c_major[(root + 4) % len(scale_c_major)]
+    note_root  = scale[(root + 0) % len(scale)]
+    note_third = scale[(root + 2) % len(scale)]
+    note_fifth = scale[(root + 4) % len(scale)]
     return note_root + note_third + note_fifth
 
 
@@ -77,8 +115,9 @@ def draw_fret_backing(x):
 # draws fretboard with guitar strings and notes
 def draw_fretboard(triad_root_note):
     # get the triad from the scale
-    triad = get_triad(scale_c_major.index(triad_root_note))
+    triad = get_triad(scale.index(triad_root_note))
     print('drawing: ' + triad_root_note + ' -> ' + triad)
+    print('in scale: ' + str(scale))
     x = 20
 
     # draw background and highlight frets
@@ -93,19 +132,36 @@ def draw_fretboard(triad_root_note):
     draw_string('E', triad, x, string_spacing * 6)
 
 
+# initialize with c major
+scale = get_scale('C')
+
 # drop down option menu to select root note of triad
-selected = tkinter.StringVar()
-selected.set(scale_c_major[0])  # init with first note in scale
-optionMenu = tkinter.OptionMenu(window, selected, *scale_c_major, command=draw_fretboard)
-optionMenu.pack()  # add menu to window
+selectedRoot = tkinter.StringVar()
+selectedRoot.set(scale[0])  # init with first note in scale
+optionMenuRoot = tkinter.OptionMenu(window, selectedRoot, *scale, command=draw_fretboard)
+optionMenuRoot.pack()  # add menu to window
+
+# drop down menu for scale
+selectedScale = tkinter.StringVar()
+selectedScale.set(notes[notes.index('C')])  # init with C (c major scale)
+optionMenuScale = tkinter.OptionMenu(window, selectedScale, *notes, command=change_scale)
+optionMenuScale.pack()  # add to window
+
 
 # canvas as drawing surface to for fretboard
 canvas = tkinter.Canvas(window, width=800, height=150, bd=2, relief=tkinter.SUNKEN)
 canvas.pack()  # add canvas to window
 
+# TODO
+# -piano canvas
+# -waveform canvas (sine)
+
 # draw fretboard
-draw_fretboard(selected.get())
-# draw_fretboard('A') # test
+draw_fretboard(selectedRoot.get())
+
+# debug
+# draw_fretboard('A')
+# print(get_scale('C'))
 
 # start the window
 window.mainloop()
