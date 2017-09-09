@@ -1,17 +1,16 @@
 import tkinter
+import math
 
 window = tkinter.Tk()  # create window
 
 # define music notes
 notes = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
 intervals = [2, 2, 1, 2, 2, 2, 1]
+# whole/half[w, w, h, w, w, w, h]
+# tone/semi [T, T, S, T, T, T, S]
 scale = []
 
-# define c major scale
-# scale_c_major = get_scale('C')['C', 'D', 'E', 'F', 'G', 'A', 'B']
-# whole/half      w,   w,   h,   w,   w,   w,   h
-# tone/semitone   T,   T,   S,   T,   T,   T,   S
-#                 2,   2,   1,   2,   2,   2,   1
+mouse_x, mouse_y = 0, 0
 
 # which frets to highlight
 fret_marking = [0, 3, 5, 7, 9, 12, 15, 17, 19, 21]
@@ -20,17 +19,38 @@ fret_spacing = 25  # how far apart to draw notes (horizontal)
 string_spacing = 20  # how far apart to draw strings (vertical)
 
 
+def create_freq_map():
+    frequency_map = dict()
+    A4 = 440  # frequency in Hz
+    A4_key = 49  # key number on piano
+    for key in range(0, 88):
+        diff = key - A4_key
+        octave = int((diff - 2) / len(notes)) + 4
+        note = notes[diff % len(notes)]
+        frequency = math.pow(2, (key - A4_key) / 12) * A4
+        frequency_map[note+str(octave)] = frequency
+        # print(note + str(octave) + ": " + str(frequency))
+        # print("{0:3} {1}".format(note+str(octave), round(frequency, 3)))
+    # sorted(note_map.items(), key=lambda x: x[1])
+    # return frequency_map
+    return sorted(frequency_map.items(), key=lambda x: x[1])
+
+
 # generate major scale
 def get_scale(root):
-    root = root.upper()
+    # root = root.upper()
     new_scale = []
-    note = notes.index(root)
+    note = notes.index(root.upper())
     for x in range(len(intervals)):
         offset = intervals[x % len(intervals)]
         new_scale.append(notes[note % len(notes)])
         note += offset
 
     return new_scale
+
+
+#def change_root(note_root):
+
 
 
 # change current operating scale
@@ -65,7 +85,7 @@ def get_triad(root):
 
 
 # draws a guitar string with notes
-def draw_string(open_note, triad, x, y):
+def draw_string(open_note, octive, triad, x, y):
     # draw line for string
     canvas.create_line(0, y, canvas['width'], y, fill='#007777')
 
@@ -123,13 +143,18 @@ def draw_fretboard(triad_root_note):
     # draw background and highlight frets
     draw_fret_backing(x)
 
+    global mouse_x, mouse_y
+    print('{}, {}'.format(mouse_x, mouse_y))
+    canvas.create_line(mouse_x, 0, mouse_x, canvas['height'], fill="red", dash=(4, 4))
+    canvas.create_line(0, mouse_y, canvas['width'], mouse_y, fill="red", dash=(4, 4))
+
     # draw each string (standard guitar tuning)
-    draw_string('E', triad, x, string_spacing * 1)
-    draw_string('B', triad, x, string_spacing * 2)
-    draw_string('G', triad, x, string_spacing * 3)
-    draw_string('D', triad, x, string_spacing * 4)
-    draw_string('A', triad, x, string_spacing * 5)
-    draw_string('E', triad, x, string_spacing * 6)
+    draw_string('E', 4, triad, x, string_spacing * 1)
+    draw_string('B', 3, triad, x, string_spacing * 2)
+    draw_string('G', 3, triad, x, string_spacing * 3)
+    draw_string('D', 3, triad, x, string_spacing * 4)
+    draw_string('A', 2, triad, x, string_spacing * 5)
+    draw_string('E', 2, triad, x, string_spacing * 6)
 
 
 # initialize with c major
@@ -138,8 +163,8 @@ scale = get_scale('C')
 # drop down option menu to select root note of triad
 selectedRoot = tkinter.StringVar()
 selectedRoot.set(scale[0])  # init with first note in scale
-optionMenuRoot = tkinter.OptionMenu(window, selectedRoot, *scale, command=draw_fretboard)
-optionMenuRoot.pack()  # add menu to window
+#optionMenuRoot = tkinter.OptionMenu(window, selectedRoot, *scale, command=change_root)# draw_fretboard)
+#optionMenuRoot.pack()  # add menu to window
 
 # drop down menu for scale
 selectedScale = tkinter.StringVar()
@@ -152,6 +177,16 @@ optionMenuScale.pack()  # add to window
 canvas = tkinter.Canvas(window, width=800, height=150, bd=2, relief=tkinter.SUNKEN)
 canvas.pack()  # add canvas to window
 
+
+def motion(event):
+    global mouse_x, mouse_y
+    mouse_x = event.x
+    mouse_y = event.y
+    # print('{}, {}'.format(mouse_x, mouse_y))
+    draw_fretboard(selectedRoot.get())
+
+canvas.bind('<Motion>', motion)
+
 # TODO
 # -piano canvas
 # -waveform canvas (sine)
@@ -162,6 +197,10 @@ draw_fretboard(selectedRoot.get())
 # debug
 # draw_fretboard('A')
 # print(get_scale('C'))
+note_map = create_freq_map()
+print('-'*10)
+for key, value in note_map:  # sorted(note_map.items(), key=lambda x: x[1]):
+    print("{0:3} {1}".format(key, round(value, 3)))
 
 # start the window
 window.mainloop()
