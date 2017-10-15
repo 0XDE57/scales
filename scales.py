@@ -5,10 +5,11 @@ window = tkinter.Tk()  # create window
 
 # define music notes
 notes = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
+# notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 intervals = [2, 2, 1, 2, 2, 2, 1]
 # whole/half[w, w, h, w, w, w, h]
 # tone/semi [T, T, S, T, T, T, S]
-scale = []
+cur_scale = []
 
 mouse_x, mouse_y = 0, 0
 
@@ -19,20 +20,90 @@ fret_spacing = 25  # how far apart to draw notes (horizontal)
 string_spacing = 20  # how far apart to draw strings (vertical)
 
 
+# predefined notes used for calculation
+# conforms to IPN(International Pitch Notation)
+c2_freq = 65.40639
+a4_freq = 440.0
+
+
+def cents_from_frequency(freq):
+    # C2 used as base "Low C"
+    return cents_from_frequency(freq, c2_freq)
+
+
+def cents_from_frequency(freq, base_freq):
+    return (math.log(freq) - math.log(base_freq)) * 1200.0 * math.log2(math.e)
+
+
+def frequency_to_note(freq):
+    #print(freq)
+    base_freq = c2_freq
+    base_octave = 2
+    total_cents = cents_from_frequency(freq, base_freq)
+    #print(total_cents)
+    while total_cents < 0:
+        base_octave -= 1
+        base_freq /= 2
+        total_cents = cents_from_frequency(freq, base_freq)
+
+    note_num = math.floor(total_cents / 100)
+    #print(note_num)
+    cents = round(total_cents - (note_num * 100))
+    #print(cents)
+
+    if cents == 100:
+        cents = 0
+        note_num += 1
+    elif cents > 50:
+        cents = cents - 100
+        note_num += 1
+
+    cents = abs(cents)
+
+    #print(cents)
+
+    octave = math.floor(note_num / 12) + base_octave
+    #print("oct: " + str(octave))
+    # note_index = 11 - (note_num % 12)
+    # print(note_index)
+
+    note = notes[(note_num + 3) % 12]
+    #print(note)
+
+    #print(str(freq) + " = " + note + str(octave) + " (" + str(cents) + ")")
+    return note + str(octave)
+    # exit(0)
+
+
+#frequency_to_note(90)
+#exit(0)
+
 def create_freq_map():
     frequency_map = dict()
-    A4 = 440  # frequency in Hz
-    A4_key = 49  # key number on piano
-    for key in range(0, 88):
-        diff = key - A4_key
-        octave = int((diff - 2) / len(notes)) + 4
-        note = notes[diff % len(notes)]
-        frequency = math.pow(2, (key - A4_key) / 12) * A4
-        frequency_map[note+str(octave)] = frequency
-        # print(note + str(octave) + ": " + str(frequency))
-        # print("{0:3} {1}".format(note+str(octave), round(frequency, 3)))
-    # sorted(note_map.items(), key=lambda x: x[1])
-    # return frequency_map
+    a4_freq = 440.0  # frequency in Hz
+    a4_key = 49  # key number
+    a4_key_MIDI = 69
+
+    count = 0
+    start_key = -20
+    for key in range(start_key, 88):
+        diff = key - a4_key
+        # octave2 = int((diff - 2) / len(notes)) + 4
+        # if diff >= 3: octave2 += 1
+        count += 1
+        octave2 = math.floor((count-1)/len(notes))-1  # math.floor((key-1) / len(notes))
+        note = notes[diff % len(notes)]  # + str(octave)
+        frequency = math.pow(2, diff / 12) * a4_freq
+        linear_frequency = math.log2(frequency / a4_freq) + 4
+        octave = math.floor(linear_frequency)
+        cents = 1200 * (linear_frequency - octave)
+        note_number = math.floor(cents / 100) % 12
+        note += str(octave2)
+        frequency_map[note] = frequency
+        if 'C' in note and '#' not in note:
+            print("")
+        print("{0:3}: {1:8} key({2:3}) diff({3}) oct({4}) oct2({5}) linFreq({6}) noteNum({7})".format(note, round(frequency, 3), key, diff, octave, octave2, round(linear_frequency,3), note_number))
+        print(frequency_to_note(frequency))
     return sorted(frequency_map.items(), key=lambda x: x[1])
 
 
@@ -52,25 +123,25 @@ def get_scale(root):
 #def change_root(note_root):
 
 
-
 # change current operating scale
 def change_scale(scale_tonic_note):
     # change scale
-    global scale
-    scale = get_scale(scale_tonic_note)
+    global cur_scale
+    cur_scale = get_scale(scale_tonic_note)
 
     # refresh options for root to be notes in new scale
     previous_root = selectedRoot.get()
+    '''
     optionMenuRoot["menu"].delete(0, 'end')
-    for n in scale:
+    for n in cur_scale:
         optionMenuRoot['menu'].add_command(label=n, command=lambda v=n: draw_fretboard(v))
-
-    if previous_root in scale:
+    '''
+    if previous_root in cur_scale:
         # print(previous_root.get() + ' in new scale')
         selectedRoot.set(previous_root)
     else:
         print('reset root to first note in scale')
-        selectedRoot.set(scale[0])
+        selectedRoot.set(cur_scale[0])
 
     # update fretboard
     draw_fretboard(selectedRoot.get())
@@ -78,9 +149,9 @@ def change_scale(scale_tonic_note):
 
 # create triad cord
 def get_triad(root):
-    note_root  = scale[(root + 0) % len(scale)]
-    note_third = scale[(root + 2) % len(scale)]
-    note_fifth = scale[(root + 4) % len(scale)]
+    note_root  = cur_scale[(root + 0) % len(cur_scale)]
+    note_third = cur_scale[(root + 2) % len(cur_scale)]
+    note_fifth = cur_scale[(root + 4) % len(cur_scale)]
     return note_root + note_third + note_fifth
 
 
@@ -135,9 +206,9 @@ def draw_fret_backing(x):
 # draws fretboard with guitar strings and notes
 def draw_fretboard(triad_root_note):
     # get the triad from the scale
-    triad = get_triad(scale.index(triad_root_note))
+    triad = get_triad(cur_scale.index(triad_root_note))
     print('drawing: ' + triad_root_note + ' -> ' + triad)
-    print('in scale: ' + str(scale))
+    print('in scale: ' + str(cur_scale))
     x = 20
 
     # draw background and highlight frets
@@ -158,11 +229,11 @@ def draw_fretboard(triad_root_note):
 
 
 # initialize with c major
-scale = get_scale('C')
+cur_scale = get_scale('C')
 
 # drop down option menu to select root note of triad
 selectedRoot = tkinter.StringVar()
-selectedRoot.set(scale[0])  # init with first note in scale
+selectedRoot.set(cur_scale[0])  # init with first note in scale
 #optionMenuRoot = tkinter.OptionMenu(window, selectedRoot, *scale, command=change_root)# draw_fretboard)
 #optionMenuRoot.pack()  # add menu to window
 
@@ -185,9 +256,11 @@ def motion(event):
     # print('{}, {}'.format(mouse_x, mouse_y))
     draw_fretboard(selectedRoot.get())
 
-canvas.bind('<Motion>', motion)
+
+#canvas.bind('<Motion>', motion)
 
 # TODO
+# -separate UI from music logic
 # -piano canvas
 # -waveform canvas (sine)
 
@@ -198,8 +271,10 @@ draw_fretboard(selectedRoot.get())
 # draw_fretboard('A')
 # print(get_scale('C'))
 note_map = create_freq_map()
-print('-'*10)
+print('-'*30)
 for key, value in note_map:  # sorted(note_map.items(), key=lambda x: x[1]):
+    if 'C' in key and '#' not in key:
+        print("")
     print("{0:3} {1}".format(key, round(value, 3)))
 
 # start the window
