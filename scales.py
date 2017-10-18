@@ -4,8 +4,8 @@ import math
 window = tkinter.Tk()  # create window
 
 # define music notes
-notes = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
-# notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+# notes = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
+notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 intervals = [2, 2, 1, 2, 2, 2, 1]
 # whole/half[w, w, h, w, w, w, h]
 # tone/semi [T, T, S, T, T, T, S]
@@ -16,7 +16,7 @@ mouse_x, mouse_y = 0, 0
 # which frets to highlight
 fret_marking = [0, 3, 5, 7, 9, 12, 15, 17, 19, 21]
 
-fret_spacing = 25  # how far apart to draw notes (horizontal)
+fret_spacing = 30#25  # how far apart to draw notes (horizontal)
 string_spacing = 20  # how far apart to draw strings (vertical)
 
 
@@ -162,15 +162,39 @@ def draw_string(open_note, octive, triad, x, y):
 
     # starting note for the string
     note_string = notes.index(open_note)
+
+    print(open_note + str(octive))
     for n in range(len(notes) * 2):
         # calculate spacing between notes
         pos_x = (n * fret_spacing) + x
         pos_y = y
         radius = 8
 
-        # get note based on string position(fret),
-        note = notes[(note_string + n) % len(notes)]
+        # notes = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
 
+        # get note based on string position(fret),
+        oct = octive + math.floor((note_string + n) / len(notes))
+        # oct = octive + math.floor((note_string + n - 3) / len(notes))
+        note = notes[(note_string + n) % len(notes)] + str(oct)
+
+
+
+        #print(str(oct))
+
+        if oct == 2:
+            canvas.create_text(pos_x, pos_y, text=note, fill='red')
+        elif oct == 3:
+            canvas.create_text(pos_x, pos_y, text=note, fill='orange')
+        elif oct == 4:
+            canvas.create_text(pos_x, pos_y, text=note, fill='yellow')
+        elif oct == 5:
+            canvas.create_text(pos_x, pos_y, text=note, fill='green')
+        elif oct == 6:
+            canvas.create_text(pos_x, pos_y, text=note, fill='blue')
+        else:
+            canvas.create_text(pos_x, pos_y, text=note, fill='purple')
+
+        '''
         # if note is a triad, mark/highlight it
         if note in triad:
             if note == triad[0]:
@@ -184,8 +208,11 @@ def draw_string(open_note, octive, triad, x, y):
             canvas.create_text(pos_x, pos_y, text=note, fill='white')
         else:
             # draw non-triad note
-            canvas.create_text(pos_x, pos_y, text=note, fill='#333333')
-
+            if oct % 2 == 0:
+                canvas.create_text(pos_x, pos_y, text=note, fill='#333333')
+            else:
+                canvas.create_text(pos_x, pos_y, text=note, fill='#666666')
+'''
 
 # draws background and frets
 def draw_fret_backing(x):
