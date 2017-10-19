@@ -1,5 +1,6 @@
 import tkinter
 import math
+import colorsys
 
 window = tkinter.Tk()  # create window
 
@@ -16,7 +17,7 @@ mouse_x, mouse_y = 0, 0
 # which frets to highlight
 fret_marking = [0, 3, 5, 7, 9, 12, 15, 17, 19, 21]
 
-fret_spacing = 30#25  # how far apart to draw notes (horizontal)
+fret_spacing = 28  # how far apart to draw notes (horizontal)
 string_spacing = 20  # how far apart to draw strings (vertical)
 
 
@@ -36,20 +37,17 @@ def cents_from_frequency(freq, base_freq):
 
 
 def frequency_to_note(freq):
-    #print(freq)
     base_freq = c2_freq
     base_octave = 2
     total_cents = cents_from_frequency(freq, base_freq)
-    #print(total_cents)
+
     while total_cents < 0:
         base_octave -= 1
         base_freq /= 2
         total_cents = cents_from_frequency(freq, base_freq)
 
     note_num = math.floor(total_cents / 100)
-    #print(note_num)
     cents = round(total_cents - (note_num * 100))
-    #print(cents)
 
     if cents == 100:
         cents = 0
@@ -59,24 +57,20 @@ def frequency_to_note(freq):
         note_num += 1
 
     cents = abs(cents)
-
-    #print(cents)
-
     octave = math.floor(note_num / 12) + base_octave
-    #print("oct: " + str(octave))
-    # note_index = 11 - (note_num % 12)
-    # print(note_index)
+    note = notes[note_num % 12]
 
-    note = notes[(note_num + 3) % 12]
-    #print(note)
-
-    #print(str(freq) + " = " + note + str(octave) + " (" + str(cents) + ")")
+    # print(note + str(octave) + ":" + str(cents))
     return note + str(octave)
-    # exit(0)
 
-
-#frequency_to_note(90)
-#exit(0)
+'''
+frequency_to_note(10548.082)
+frequency_to_note(5.626)
+frequency_to_note(8.176)
+frequency_to_note(440)
+frequency_to_note(90)
+exit(0)
+'''
 
 def create_freq_map():
     frequency_map = dict()
@@ -128,7 +122,7 @@ def change_scale(scale_tonic_note):
     # change scale
     global cur_scale
     cur_scale = get_scale(scale_tonic_note)
-
+    print(scale_tonic_note)
     # refresh options for root to be notes in new scale
     previous_root = selectedRoot.get()
     '''
@@ -144,15 +138,15 @@ def change_scale(scale_tonic_note):
         selectedRoot.set(cur_scale[0])
 
     # update fretboard
-    draw_fretboard(selectedRoot.get())
+    draw_fretboard(scale_tonic_note)
 
 
 # create triad cord
 def get_triad(root):
-    note_root  = cur_scale[(root + 0) % len(cur_scale)]
-    note_third = cur_scale[(root + 2) % len(cur_scale)]
-    note_fifth = cur_scale[(root + 4) % len(cur_scale)]
-    return note_root + note_third + note_fifth
+    return [cur_scale[(root + 0) % len(cur_scale)],  # root
+            cur_scale[(root + 2) % len(cur_scale)],  # third
+            cur_scale[(root + 4) % len(cur_scale)]]  # fifth
+
 
 
 # draws a guitar string with notes
@@ -164,55 +158,48 @@ def draw_string(open_note, octive, triad, x, y):
     note_string = notes.index(open_note)
 
     print(open_note + str(octive))
-    for n in range(len(notes) * 2):
+    for fret in range(len(notes) * 2):
         # calculate spacing between notes
-        pos_x = (n * fret_spacing) + x
+        pos_x = (fret * fret_spacing) + x
         pos_y = y
-        radius = 8
-
-        # notes = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
+        radius = 9
 
         # get note based on string position(fret),
-        oct = octive + math.floor((note_string + n) / len(notes))
-        # oct = octive + math.floor((note_string + n - 3) / len(notes))
-        note = notes[(note_string + n) % len(notes)] + str(oct)
+        relative_oct = octive + math.floor((note_string + fret) / len(notes))
+        note = notes[(note_string + fret) % len(notes)]
+        color = get_color_for_octave(relative_oct)
+        # canvas.create_rectangle(pos_x - radius, pos_y - radius, pos_x + radius, pos_y + radius, fill=color)
 
-
-
-        #print(str(oct))
-
-        if oct == 2:
-            canvas.create_text(pos_x, pos_y, text=note, fill='red')
-        elif oct == 3:
-            canvas.create_text(pos_x, pos_y, text=note, fill='orange')
-        elif oct == 4:
-            canvas.create_text(pos_x, pos_y, text=note, fill='yellow')
-        elif oct == 5:
-            canvas.create_text(pos_x, pos_y, text=note, fill='green')
-        elif oct == 6:
-            canvas.create_text(pos_x, pos_y, text=note, fill='blue')
-        else:
-            canvas.create_text(pos_x, pos_y, text=note, fill='purple')
-
-        '''
-        # if note is a triad, mark/highlight it
+        # highlight triads
         if note in triad:
+            canvas.create_text(pos_x, pos_y, text=note, fill=color)
             if note == triad[0]:
                 # mark root note
-                canvas.create_rectangle(pos_x-radius, pos_y-radius, pos_x+radius, pos_y+radius)
+                canvas.create_rectangle(pos_x-radius, pos_y-radius, pos_x+radius, pos_y+radius, outline=color)
             else:
                 # mark triad note
-                canvas.create_oval(pos_x-radius, pos_y-radius, pos_x+radius, pos_y+radius)
-
-            # draw triad note
-            canvas.create_text(pos_x, pos_y, text=note, fill='white')
+                canvas.create_oval(pos_x-radius, pos_y-radius, pos_x+radius, pos_y+radius, outline=color)
         else:
-            # draw non-triad note
-            if oct % 2 == 0:
-                canvas.create_text(pos_x, pos_y, text=note, fill='#333333')
-            else:
-                canvas.create_text(pos_x, pos_y, text=note, fill='#666666')
-'''
+            canvas.create_text(pos_x, pos_y, text=note, fill='#333333')
+
+
+def get_color_for_octave(octave):
+    #colorsys.rgb_to_hls(1, 0, 0)
+    if octave == 1:
+        return '#9400D3'
+    elif octave == 2:
+        return '#4B0082'
+    elif octave == 3:
+        return '#0000FF'
+    elif octave == 4:
+        return '#00FF00'
+    elif octave == 5:
+        return '#FFFF00'
+    elif octave == 6:
+        return '#FF0000'
+    else:
+        return 'black'
+
 
 # draws background and frets
 def draw_fret_backing(x):
@@ -234,7 +221,7 @@ def draw_fret_backing(x):
 def draw_fretboard(triad_root_note):
     # get the triad from the scale
     triad = get_triad(cur_scale.index(triad_root_note))
-    print('drawing: ' + triad_root_note + ' -> ' + triad)
+    print('drawing: ' + triad_root_note + ' -> ' + str(triad))
     print('in scale: ' + str(cur_scale))
     x = 20
 
