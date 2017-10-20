@@ -2,10 +2,18 @@ import tkinter
 import math
 import colorsys
 
+# TODO
+# [...] clean up and bug fix
+# [ ] scale selection
+# [ ] separate UI from music logic
+# [ ] piano canvas
+# [ ] waveform canvas (sine)
+# [ ] midi input
+# [ ] sine wave generation
+
 window = tkinter.Tk()  # create window
 
 # define music notes
-# notes = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
 notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 intervals = [2, 2, 1, 2, 2, 2, 1]
 # whole/half[w, w, h, w, w, w, h]
@@ -63,42 +71,26 @@ def frequency_to_note(freq):
     # print(note + str(octave) + ":" + str(cents))
     return note + str(octave)
 
-'''
-frequency_to_note(10548.082)
-frequency_to_note(5.626)
-frequency_to_note(8.176)
-frequency_to_note(440)
-frequency_to_note(90)
-exit(0)
-'''
 
 def create_freq_map():
-    frequency_map = dict()
-    a4_freq = 440.0  # frequency in Hz
-    a4_key = 49  # key number
+    frequency_map = {}
     a4_key_MIDI = 69
 
-    count = 0
-    start_key = -20
-    for key in range(start_key, 88):
-        diff = key - a4_key
-        # octave2 = int((diff - 2) / len(notes)) + 4
-        # if diff >= 3: octave2 += 1
-        count += 1
-        octave2 = math.floor((count-1)/len(notes))-1  # math.floor((key-1) / len(notes))
-        note = notes[diff % len(notes)]  # + str(octave)
-        frequency = math.pow(2, diff / 12) * a4_freq
-        linear_frequency = math.log2(frequency / a4_freq) + 4
-        octave = math.floor(linear_frequency)
-        cents = 1200 * (linear_frequency - octave)
-        note_number = math.floor(cents / 100) % 12
-        note += str(octave2)
+    for key_number in range(len(notes) * 9):
+        # twelfth root of two
+        # represents the frequency ratio of a semitone in twelve-tone equal temperament
+        frequency = math.pow(2, (key_number - a4_key_MIDI) / 12) * a4_freq
+        note = frequency_to_note(frequency)
         frequency_map[note] = frequency
-        if 'C' in note and '#' not in note:
+
+    print('-' * 30)
+    for key, value in frequency_map.items():
+        if 'C' in key and '#' not in key:
             print("")
-        print("{0:3}: {1:8} key({2:3}) diff({3}) oct({4}) oct2({5}) linFreq({6}) noteNum({7})".format(note, round(frequency, 3), key, diff, octave, octave2, round(linear_frequency,3), note_number))
-        print(frequency_to_note(frequency))
-    return sorted(frequency_map.items(), key=lambda x: x[1])
+        print("{0:4} {1}".format(key, round(value, 3)))
+    print('----')
+
+    return frequency_map  # sorted(frequency_map.items(), key=lambda x: x[1])
 
 
 # generate major scale
@@ -148,16 +140,15 @@ def get_triad(root):
             cur_scale[(root + 4) % len(cur_scale)]]  # fifth
 
 
-
 # draws a guitar string with notes
-def draw_string(open_note, octive, triad, x, y):
+def draw_string(open_note, octave, triad, x, y):
     # draw line for string
     canvas.create_line(0, y, canvas['width'], y, fill='#007777')
 
     # starting note for the string
     note_string = notes.index(open_note)
 
-    print(open_note + str(octive))
+    print('drawing string: ' + open_note + str(octave))
     for fret in range(len(notes) * 2):
         # calculate spacing between notes
         pos_x = (fret * fret_spacing) + x
@@ -165,8 +156,10 @@ def draw_string(open_note, octive, triad, x, y):
         radius = 9
 
         # get note based on string position(fret),
-        relative_oct = octive + math.floor((note_string + fret) / len(notes))
+        relative_oct = octave + math.floor((note_string + fret) / len(notes))
         note = notes[(note_string + fret) % len(notes)]
+        frequency = str(round(note_map[note + str(relative_oct)]))
+
         color = get_color_for_octave(relative_oct)
         # canvas.create_rectangle(pos_x - radius, pos_y - radius, pos_x + radius, pos_y + radius, fill=color)
 
@@ -181,6 +174,9 @@ def draw_string(open_note, octive, triad, x, y):
                 canvas.create_oval(pos_x-radius, pos_y-radius, pos_x+radius, pos_y+radius, outline=color)
         else:
             canvas.create_text(pos_x, pos_y, text=note, fill='#333333')
+
+        # show frequency
+        canvas.create_text(pos_x, pos_y+7, text=frequency, font=("Purisa", 9), fill='white')
 
 
 def get_color_for_octave(octave):
@@ -244,6 +240,7 @@ def draw_fretboard(triad_root_note):
 
 # initialize with c major
 cur_scale = get_scale('C')
+note_map = create_freq_map()
 
 # drop down option menu to select root note of triad
 selectedRoot = tkinter.StringVar()
@@ -263,6 +260,7 @@ canvas = tkinter.Canvas(window, width=800, height=150, bd=2, relief=tkinter.SUNK
 canvas.pack()  # add canvas to window
 
 
+'''
 def motion(event):
     global mouse_x, mouse_y
     mouse_x = event.x
@@ -270,26 +268,15 @@ def motion(event):
     # print('{}, {}'.format(mouse_x, mouse_y))
     draw_fretboard(selectedRoot.get())
 
+canvas.bind('<Motion>', motion)  # test
+'''
 
-#canvas.bind('<Motion>', motion)
 
-# TODO
-# -separate UI from music logic
-# -piano canvas
-# -waveform canvas (sine)
+
 
 # draw fretboard
 draw_fretboard(selectedRoot.get())
 
-# debug
-# draw_fretboard('A')
-# print(get_scale('C'))
-note_map = create_freq_map()
-print('-'*30)
-for key, value in note_map:  # sorted(note_map.items(), key=lambda x: x[1]):
-    if 'C' in key and '#' not in key:
-        print("")
-    print("{0:3} {1}".format(key, round(value, 3)))
 
 # start the window
 window.mainloop()
