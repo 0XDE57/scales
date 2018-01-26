@@ -2,6 +2,7 @@ import tkinter
 import math
 
 import music
+import fretboard
 import colorsys
 
 # TODO
@@ -22,14 +23,15 @@ import colorsys
 window = tkinter.Tk()  # create window
 
 
-mouse_x, mouse_y = 0, 0
+# mouse_x, mouse_y = 0, 0
 
+'''
 # which frets to highlight
 fret_marking = [0, 3, 5, 7, 9, 12, 15, 17, 19, 21]
 
 fret_spacing = 28  # how far apart to draw notes (horizontal)
 string_spacing = 20  # how far apart to draw strings (vertical)
-
+'''
 
 # change current operating scale
 def change_scale(scale_tonic_note):
@@ -53,9 +55,9 @@ def change_scale(scale_tonic_note):
         selectedRoot.set(music.cur_scale[0])
 
     # update fretboard
-    draw_fretboard(scale_tonic_note)
+    myfretboard.draw_fretboard(scale_tonic_note)
 
-
+'''
 # draws a guitar string with notes
 def draw_string(open_note, octave, triad, x, y):
     # draw line for string
@@ -152,11 +154,11 @@ def draw_fretboard(triad_root_note):
     draw_string('D', 3, triad, x, string_spacing * 4)
     draw_string('A', 2, triad, x, string_spacing * 5)
     draw_string('E', 2, triad, x, string_spacing * 6)
-
+'''
 
 # initialize with c major
 music.cur_scale = music.get_scale('C')
-note_map = music.create_freq_map()
+#note_map = music.create_freq_map()
 
 # drop down option menu to select root note of triad
 selectedRoot = tkinter.StringVar()
@@ -172,8 +174,9 @@ optionMenuScale.pack()  # add to window
 
 
 # canvas as drawing surface to for fretboard
-canvas = tkinter.Canvas(window, width=800, height=150, bd=2, relief=tkinter.SUNKEN)
-canvas.pack()  # add canvas to window
+# canvas = tkinter.Canvas(window, width=800, height=150, bd=2, relief=tkinter.SUNKEN)
+myfretboard = fretboard.Fretboard(window, 800, 150)
+myfretboard.canvas.pack()  # add canvas to window
 
 
 '''
@@ -189,8 +192,8 @@ canvas.bind('<Motion>', motion)  # test
 
 
 # draw fretboard
-draw_fretboard(selectedRoot.get())
-
+#myfretboard.draw_fretboard(selectedRoot.get())
+change_scale(selectedRoot.get())
 
 # start the window
 window.mainloop()
