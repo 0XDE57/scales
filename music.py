@@ -5,7 +5,6 @@ notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 intervals = [2, 2, 1, 2, 2, 2, 1]
 # whole/half[w, w, h, w, w, w, h]
 # tone/semi [T, T, S, T, T, T, S]
-cur_scale = []
 
 
 # predefined notes used for calculation

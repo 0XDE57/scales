@@ -14,7 +14,8 @@ class Fretboard:
         self.string_spacing = 20  # how far apart to draw strings (vertical)
 
         self.note_map = music.create_freq_map()
-        music.cur_scale = music.get_scale('C')
+        self.show_freq = False
+        #music.cur_scale = music.get_scale('C')
 
     # draws a guitar string with notes
     def draw_string(self, open_note, octave, triad, x, y):
@@ -52,6 +53,7 @@ class Fretboard:
                 self.canvas.create_text(pos_x, pos_y, text=fret_note, fill='#333333')
 
             # show frequency
+            if self.show_freq:
                 self.canvas.create_text(pos_x, pos_y+7, text=fret_frequency, font=("Purisa", 9), fill='white')
 
     def get_color_for_octave(self, octave):
@@ -87,11 +89,11 @@ class Fretboard:
             self.canvas.create_text(pos_x, self.string_spacing * 7, text=fret, fill='#007777')
 
     # draws fretboard with guitar strings and notes
-    def draw_fretboard(self, triad_root_note):
+    def draw_fretboard(self, triad):
         # get the triad from the scale
-        triad = music.get_triad(music.cur_scale.index(triad_root_note), music.cur_scale)
-        print('drawing: ' + triad_root_note + ' -> ' + str(triad))
-        print('in key: ' + str(music.cur_scale))
+        #triad = music.get_triad(music.cur_scale.index(triad_root_note), music.cur_scale)
+        #print('drawing: ' + triad_root_note + ' -> ' + str(triad))
+        # print('in key: ' + str(music.cur_scale))
         x = 20
 
         # draw background and highlight frets
