@@ -2,13 +2,12 @@ import math
 
 # define music notes
 notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+
 intervals = [2, 2, 1, 2, 2, 2, 1]
 # whole/half[w, w, h, w, w, w, h]
 # tone/semi [T, T, S, T, T, T, S]
 
-
-# predefined notes used for calculation
-# conforms to IPN(International Pitch Notation)
+# predefined notes used for calculation: conforms to IPN (International Pitch Notation)
 c2_freq = 65.40639
 a4_freq = 440.0
 a4_key_MIDI = 69
@@ -73,7 +72,6 @@ def create_freq_map():
 
 # generate major scale
 def get_scale(root):  # actually change key, scale is same, key is different?
-    # root = root.upper()
     new_scale = []
     note = notes.index(root.upper())
     for x in range(len(intervals)):
@@ -88,8 +86,8 @@ def get_scale(root):  # actually change key, scale is same, key is different?
 def get_triad(root, scale):
     return [scale[(root + 0) % len(scale)],  # root | tonic
             scale[(root + 2) % len(scale)],  # third
-            scale[(root + 4) % len(scale)],  # fifth | dominant
-            scale[(root + 6) % len(scale)]]  # seventh
+            scale[(root + 4) % len(scale)]]  # fifth | dominant
+            #scale[(root + 6) % len(scale)]]  # seventh
 
 
 

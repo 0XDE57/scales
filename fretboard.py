@@ -6,7 +6,7 @@ import music
 
 class Fretboard:
     def __init__(self, window, w, h):
-        self.canvas = tkinter.Canvas(window, width=w, height=h, bd=2, relief=tkinter.SUNKEN)
+        self.canvas = tkinter.Canvas(window, width=w, height=h, bd=2, relief=tkinter.SOLID)
         # which frets to highlight
         self.fret_marking = [0, 3, 5, 7, 9, 12, 15, 17, 19, 21]
 
@@ -42,7 +42,7 @@ class Fretboard:
 
             # highlight triads
             if fret_note in triad:
-                self.canvas.create_text(pos_x, pos_y, text=fret_note, fill=color)
+                self.canvas.create_text(pos_x, pos_y, text=fret_note, fill=color, activefill='white')
                 if fret_note == triad[0]:
                     # mark root note
                     self.canvas.create_rectangle(pos_x-radius, pos_y-radius, pos_x+radius, pos_y+radius, outline=color)
@@ -50,7 +50,7 @@ class Fretboard:
                     # mark triad note
                     self.canvas.create_oval(pos_x-radius, pos_y-radius, pos_x+radius, pos_y+radius, outline=color)
             else:
-                self.canvas.create_text(pos_x, pos_y, text=fret_note, fill='#333333')
+                self.canvas.create_text(pos_x, pos_y, text=fret_note, fill='#333333', activefill='white')
 
             # show frequency
             if self.show_freq:
@@ -75,15 +75,21 @@ class Fretboard:
 
     # draws background and frets
     def draw_fret_backing(self, x):
+        width = int(self.canvas['width']) + 4
+        height = int(self.canvas['height']) + 4
         # draw background
-        self.canvas.create_rectangle(0, 0, self.canvas['width'], self.canvas['height'], fill='#777777')
+        self.canvas.create_rectangle(0, 0, width, height, fill='#777777')
 
         for fret in range(len(music.notes) * 2):
             pos_x = (fret * self.fret_spacing) + x
 
             # highlight frets
             if fret in self.fret_marking:
-                self.canvas.create_rectangle(pos_x - self.fret_spacing/2, 0, pos_x + self.fret_spacing/2, self.canvas["height"], fill='#999999')
+                self.canvas.create_rectangle(
+                    pos_x - self.fret_spacing/2,
+                    0,
+                    pos_x + self.fret_spacing/2,
+                    height, fill='#999999')
 
             # draw fret number
             self.canvas.create_text(pos_x, self.string_spacing * 7, text=fret, fill='#007777')

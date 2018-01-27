@@ -7,7 +7,7 @@ import keyboard
 # TODO
 # [...] scale selection
 # [...] piano canvas
-# [ ] note canvas
+# [ ] note/staff canvas
 # [ ] waveform canvas (sine)
 # [ ] circle of fifths canvas
 # [ ] midi input
@@ -47,9 +47,11 @@ def change_scale(scale_tonic_note):
         print('reset root to first note in scale')
         selectedRoot.set(cur_scale[0])
 
-    # update fretboard
+    # update instruments
     guitar.show_freq = sf.get()
     guitar.draw_fretboard(triad)
+
+    piano.draw();
 
 
 # initialize with c major
@@ -105,7 +107,6 @@ canvas.bind('<Motion>', motion)  # test
 
 
 # draw fretboard
-#myfretboard.draw_fretboard(selectedRoot.get())
 change_scale(selectedRoot.get())
 
 # start the window
