@@ -3,6 +3,15 @@ import math
 # define music notes
 notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
+# modes/diatonic scale: Ionian, Dorian, Phrygian, Lydian, Mixolydian, Aeolian, Locrian
+mode_ionian     = [2, 2, 1, 2, 2, 2, 1]  # major
+mode_dorian     = [2, 1, 2, 2, 2, 1, 2]
+mode_phrygian   = [1, 2, 2, 2, 1, 2, 2]
+mode_lydian     = [2, 2, 2, 1, 2, 2, 1]
+mode_mixolydian = [2, 2, 1, 2, 2, 1, 2]  # dominant
+mode_aeolian    = [2, 1, 2, 2, 1, 2, 2]  # natural minor
+mode_locrian    = [1, 2, 2, 1, 2, 2, 2]
+
 intervals = [2, 2, 1, 2, 2, 2, 1]
 # whole/half[w, w, h, w, w, w, h]
 # tone/semi [T, T, S, T, T, T, S]

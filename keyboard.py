@@ -8,14 +8,14 @@ class Keyboard:
         self.canvas = tkinter.Canvas(window, width=w, height=h, bd=2, relief=tkinter.SOLID)
 
     def draw(self):
+        print('rendering piano')
         # per octave
         white_keys = 7
-        black_keys = 5
+        # black_keys = 5
         keyspan_octave = ['w', 'b', 'w', 'b', 'w', 'w', 'b', 'w', 'b', 'w', 'b', 'w']
-        test = [1, 2, 4, 5, 6]
+        black_keys = [1, 2, 4, 5, 6]
 
-
-        num_octaves = 3
+        num_octaves = 4
         num_keys = white_keys * num_octaves
         key_width = (int(self.canvas["width"]) + 4) / num_keys
         for key in range(white_keys * num_octaves):
@@ -25,9 +25,11 @@ class Keyboard:
                                          pos_x + key_width,
                                          int(self.canvas["height"]) + 4,
                                          fill='white', activefill='#999999')
+            # self.canvas.create_text()
+
         black_width = key_width * 0.7
-        for key in range(12 * num_octaves):
-            if key % white_keys in test:
+        for key in range(len(music.notes) * num_octaves):
+            if key % white_keys in black_keys:
                 pos_x = (key * key_width)
                 self.canvas.create_rectangle(pos_x - black_width/2,
                                              0,
