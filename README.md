@@ -12,6 +12,8 @@ an experimental project with the goal of learning music theory, and implenting w
 
 setup on linux may require:
 
+`pip install rtmidi-python`
+
 `sudo apt-get install python3-tk`
 
 or for python 3.6:
