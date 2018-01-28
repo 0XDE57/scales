@@ -11,6 +11,8 @@ class Keyboard:
         print('rendering piano')
         # per octave
         white_keys = 7
+        white_key_notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+        black_key_notes = ['C#', 'D#', 'F#', 'G#', 'A#']
         # black_keys = 5
         keyspan_octave = ['w', 'b', 'w', 'b', 'w', 'w', 'b', 'w', 'b', 'w', 'b', 'w']
         black_keys = [1, 2, 4, 5, 6]
@@ -25,17 +27,25 @@ class Keyboard:
                                          pos_x + key_width,
                                          int(self.canvas["height"]) + 4,
                                          fill='white', activefill='#999999')
-            # self.canvas.create_text()
+
+            note = white_key_notes[key % len(white_key_notes)]
+            self.canvas.create_text(pos_x+key_width/2, int(self.canvas["height"])-10, text=note, fill='#333333')
 
         black_width = key_width * 0.7
+        height = int(self.canvas["height"])*0.7
+        count = 0
         for key in range(len(music.notes) * num_octaves):
             if key % white_keys in black_keys:
                 pos_x = (key * key_width)
                 self.canvas.create_rectangle(pos_x - black_width/2,
                                              0,
                                              pos_x + black_width/2,
-                                             int(self.canvas["height"])*0.7,
+                                             height,
                                              fill='black', activefill='#999999')
+
+                note = black_key_notes[count % len(black_key_notes)]
+                count += 1
+                self.canvas.create_text(pos_x, 15, text=note, fill='white')
         '''
         width = int(self.canvas["width"]) + 4
         height = int(self.canvas["height"]) + 4

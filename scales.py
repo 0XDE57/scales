@@ -96,6 +96,7 @@ show_freq.pack()
 # [ ] toggle include octave
 # [ ] toggle color octave
 # [ ] toggle draw fret number
+# [ ] toggle show non-highlighted notes
 # [ ] pick strings/octaves
 # [ ] add/remove strings
 # [ ] load presets eg:
@@ -128,8 +129,8 @@ canvas.bind('<Motion>', motion)  # test
 '''
 
 
-midi = midi.MIDIthread();
-midi.start();
+#midi = midi.MIDIthread();
+#midi.start();
 
 # draw fretboard
 change_scale(selectedRoot.get())
