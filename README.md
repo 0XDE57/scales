@@ -16,4 +16,4 @@ setup on linux may require:
 
 or for python 3.6:
 
-`sudo apt-get nstall python3.6-tk`
+`sudo apt-get install python3.6-tk`
