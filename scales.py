@@ -54,6 +54,7 @@ def change_scale(scale_tonic_note):
     guitar.show_freq = sf.get()
     guitar.draw_fretboard(triad)
 
+    piano.triad = triad
     piano.draw()
 
 
@@ -112,6 +113,7 @@ piano = keyboard.Keyboard(piano_group, 800, 150)
 # TODO:
 # [ ] number of octaves
 # [ ] toggle color octave
+# [ ] starting octave
 piano.canvas.pack()
 piano_group.pack()
 

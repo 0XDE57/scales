@@ -2,7 +2,7 @@ import tkinter
 import math
 
 import music
-
+import util
 
 class Fretboard:
     def __init__(self, window, w, h):
@@ -37,7 +37,7 @@ class Fretboard:
             fret_note = music.notes[(note_string + fret) % len(music.notes)]
             fret_frequency = str(round(self.note_map[fret_note + str(fret_oct)]))
 
-            color = self.get_color_for_octave(fret_oct)
+            color = util.get_color_for_octave(fret_oct)
             # canvas.create_rectangle(pos_x - radius, pos_y - radius, pos_x + radius, pos_y + radius, fill=color)
 
             # highlight triads
@@ -56,22 +56,6 @@ class Fretboard:
             if self.show_freq:
                 self.canvas.create_text(pos_x, pos_y+7, text=fret_frequency, font=("Purisa", 9), fill='white')
 
-    def get_color_for_octave(self, octave):
-        # colorsys.rgb_to_hls(1, 0, 0)
-        if octave == 1:
-            return '#9400D3'
-        elif octave == 2:
-            return '#4B0082'
-        elif octave == 3:
-            return '#0000FF'
-        elif octave == 4:
-            return '#00FF00'
-        elif octave == 5:
-            return '#FFFF00'
-        elif octave == 6:
-            return '#FF0000'
-        else:
-            return 'black'
 
     # draws background and frets
     def draw_fret_backing(self, x):
