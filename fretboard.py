@@ -4,21 +4,21 @@ import math
 import music
 import util
 
+
 class Fretboard:
     def __init__(self, window, w, h):
         self.canvas = tkinter.Canvas(window, width=w, height=h, bd=2, relief=tkinter.SOLID)
-        # which frets to highlight
-        self.fret_marking = [0, 3, 5, 7, 9, 12, 15, 17, 19, 21]
 
+        self.fret_marking = [0, 3, 5, 7, 9, 12, 15, 17, 19, 21]  # which frets to highlight
         self.fret_spacing = 28  # how far apart to draw notes (horizontal)
         self.string_spacing = 20  # how far apart to draw strings (vertical)
 
         self.note_map = music.create_freq_map()
         self.show_freq = False
-        #music.cur_scale = music.get_scale('C')
+        self.triad = None
 
     # draws a guitar string with notes
-    def draw_string(self, open_note, octave, triad, x, y):
+    def draw_string(self, open_note, octave, x, y):
         # draw line for string
         self.canvas.create_line(0, y, self.canvas['width'], y, fill='#007777')
 
@@ -41,9 +41,9 @@ class Fretboard:
             # canvas.create_rectangle(pos_x - radius, pos_y - radius, pos_x + radius, pos_y + radius, fill=color)
 
             # highlight triads
-            if fret_note in triad:
+            if fret_note in self.triad:
                 self.canvas.create_text(pos_x, pos_y, text=fret_note, fill=color, activefill='white')
-                if fret_note == triad[0]:
+                if fret_note == self.triad[0]:
                     # mark root note
                     self.canvas.create_rectangle(pos_x-radius, pos_y-radius, pos_x+radius, pos_y+radius, outline=color)
                 else:
@@ -79,7 +79,7 @@ class Fretboard:
             self.canvas.create_text(pos_x, self.string_spacing * 7, text=fret, fill='#007777')
 
     # draws fretboard with guitar strings and notes
-    def draw_fretboard(self, triad):
+    def draw(self):
         # get the triad from the scale
         #triad = music.get_triad(music.cur_scale.index(triad_root_note), music.cur_scale)
         #print('drawing: ' + triad_root_note + ' -> ' + str(triad))
@@ -97,9 +97,9 @@ class Fretboard:
         '''
 
         # draw each string (standard guitar tuning)
-        self.draw_string('E', 4, triad, x, self.string_spacing * 1)
-        self.draw_string('B', 3, triad, x, self.string_spacing * 2)
-        self.draw_string('G', 3, triad, x, self.string_spacing * 3)
-        self.draw_string('D', 3, triad, x, self.string_spacing * 4)
-        self.draw_string('A', 2, triad, x, self.string_spacing * 5)
-        self.draw_string('E', 2, triad, x, self.string_spacing * 6)
+        self.draw_string('E', 4, x, self.string_spacing * 1)
+        self.draw_string('B', 3, x, self.string_spacing * 2)
+        self.draw_string('G', 3, x, self.string_spacing * 3)
+        self.draw_string('D', 3, x, self.string_spacing * 4)
+        self.draw_string('A', 2, x, self.string_spacing * 5)
+        self.draw_string('E', 2, x, self.string_spacing * 6)

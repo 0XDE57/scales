@@ -21,6 +21,12 @@ c2_freq = 65.40639
 a4_freq = 440.0
 a4_key_MIDI = 69
 
+class Note:
+    def __init__(self, note, octave):
+        self.note = note
+        self.octave = octave
+        # self.frequency =
+        # self.cents =
 
 def cents_from_frequency(freq):
     # C2 used as base "Low C"

@@ -7,8 +7,8 @@ import midi
 
 # TODO
 # [...] piano canvas
-# [...] midi input/output
-# [ ] note highlight linking between keyboard and fretboard to display 1-1 mapping
+# [ ] midi input/output
+# [...] note highlight linking between keyboard and fretboard to display 1-1 mapping
 # [ ] mode selection -> shifting intervals (Ionian,Dorian,Phrygian,etc...)
 # [ ] options for instruments
 # [ ] circle of fifths canvas
@@ -20,78 +20,74 @@ import midi
 #       - circle of 5ths
 #       - define key, define mode, define scale (i am confused, they are all the same but different?)
 #       - what makes a scale or chord minor or major?
+'''
+TODO: figure out structure
+instrument -> piano
+instrument -> guitar
+note -> key(y) -> keyboard
+note -> fret/string(x,y) -> fretboard
+
+note -> letter, octave, frequency, cents, midi_key
+
+key -> rectangle widget, note, state(highlight, focus, click, 
+fret -> text widget with circle / rect outline, hmm...
+'''
 
 
-# change current operating scale
-def change_scale(scale_tonic_note):
-    # change scale
+def update_ui(*args):
+    scale_tonic_note = tk_stringvar_selected_tonic.get()
+
     global cur_scale
     cur_scale = music.get_scale(scale_tonic_note)
     triad = music.get_triad(cur_scale.index(scale_tonic_note), cur_scale)
+
     print(scale_tonic_note + ' -> ' + str(triad))
     print('in key: ' + str(cur_scale))
 
-    # refresh options for root to be notes in new scale
-    previous_root = selectedRoot.get()
-    '''
-    optionMenuRoot["menu"].delete(0, 'end')
-    for n in cur_scale:
-        optionMenuRoot['menu'].add_command(label=n, command=lambda v=n: draw_fretboard(v))
-    '''
-    scale_text.delete(0, 'end')
-    scale_text.insert(0, cur_scale)
-    triad_text.delete(0, 'end')
-    triad_text.insert(0, triad)
-
-    if previous_root in cur_scale:
-        # print(previous_root.get() + ' in new scale')
-        selectedRoot.set(previous_root)
-    else:
-        print('reset root to first note in scale')
-        selectedRoot.set(cur_scale[0])
+    tk_entry_scale_text.delete(0, 'end')
+    tk_entry_scale_text.insert(0, cur_scale)
+    tk_entry_triad_text.delete(0, 'end')
+    tk_entry_triad_text.insert(0, triad)
 
     # update instruments
-    guitar.show_freq = sf.get()
-    guitar.draw_fretboard(triad)
+    guitar.show_freq = tk_intvar_show_freq.get()
+    guitar.triad = triad
+    guitar.draw()
 
     piano.triad = triad
     piano.draw()
 
 
-window = tkinter.Tk()  # create window
+'''
+init 
+'''
+tk_main_window = tkinter.Tk()  # create window
+cur_scale = music.get_scale('C')  # initialize with c major
 
-# initialize with c major
-cur_scale = music.get_scale('C')
 
-option_group = tkinter.LabelFrame(window, text="scales")
-option_group.pack(fill="both", expand="yes")
-
+'''
+build options section
+'''
+tk_labelframe_options = tkinter.LabelFrame(tk_main_window, text="scales")
+tk_labelframe_options.pack(fill="both", expand="yes")
 
 # drop down option menu to select root note of triad
-selectedRoot = tkinter.StringVar()
-selectedRoot.set(cur_scale[0])  # init with first note in scale
-#optionMenuRoot = tkinter.OptionMenu(window, selectedRoot, *scale, command=change_root)# draw_fretboard)
-#optionMenuRoot.pack()  # add menu to window
+tk_stringvar_selected_tonic = tkinter.StringVar()
+tk_stringvar_selected_tonic.set(music.notes[music.notes.index('C')])  # init with C (c major scale)
+tk_optionmenu_tonic_selection = tkinter.OptionMenu(tk_labelframe_options, tk_stringvar_selected_tonic, *music.notes, command=update_ui)
+tk_optionmenu_tonic_selection.pack()
 
-# drop down menu for scale
-selectedScale = tkinter.StringVar()
-selectedScale.set(music.notes[music.notes.index('C')])  # init with C (c major scale)
-optionMenuScale = tkinter.OptionMenu(option_group, selectedScale, *music.notes, command=change_scale)
-optionMenuScale.pack()  # add to window
-
-triad_text = tkinter.Entry(option_group)
-scale_text = tkinter.Entry(option_group)
-triad_text.pack()
-scale_text.pack()
+# scale and triad display
+tk_entry_triad_text = tkinter.Entry(tk_labelframe_options)
+tk_entry_scale_text = tkinter.Entry(tk_labelframe_options)
+tk_entry_triad_text.pack()
+tk_entry_scale_text.pack()
 
 
-# add instruments
-guitar_group = tkinter.LabelFrame(window, text='guitar')
-guitar = fretboard.Fretboard(guitar_group, 800, 150)
-guitar.canvas.pack()
-sf = tkinter.IntVar()
-show_freq = tkinter.Checkbutton(guitar_group, text='Show Frequency', variable=sf, command=change_scale)
-show_freq.pack()
+'''
+add instruments
+'''
+# add guitar
 # TODO:
 # [ ] toggle draw note
 # [ ] toggle include octave
@@ -105,18 +101,23 @@ show_freq.pack()
 #       - guitar6dropD = [D4, B3, G3, D3, A2, E2]
 #       - bass4 = [G2, D2, A1, E1]
 #       - base5 = [G2, D2, A1, E1, B0]
-guitar_group.pack()
+tk_labelframe_guitar_group = tkinter.LabelFrame(tk_main_window, text='guitar')
+guitar = fretboard.Fretboard(tk_labelframe_guitar_group, 800, 150)
+guitar.canvas.pack()
+tk_intvar_show_freq = tkinter.IntVar()
+tk_checkbutton_show_freq = tkinter.Checkbutton(tk_labelframe_guitar_group, text='Show Frequency', variable=tk_intvar_show_freq, command=update_ui)
+tk_checkbutton_show_freq.pack()
+tk_labelframe_guitar_group.pack()
 
-
-piano_group = tkinter.LabelFrame(window, text="piano")
-piano = keyboard.Keyboard(piano_group, 800, 150)
+# piano
 # TODO:
 # [ ] number of octaves
 # [ ] toggle color octave
 # [ ] starting octave
+tk_labelframe_piano_group = tkinter.LabelFrame(tk_main_window, text="piano")
+piano = keyboard.Keyboard(tk_labelframe_piano_group, 800, 150)
 piano.canvas.pack()
-piano_group.pack()
-
+tk_labelframe_piano_group.pack()
 
 '''
 mouse_x, mouse_y = 0, 0
@@ -130,12 +131,14 @@ def motion(event):
 canvas.bind('<Motion>', motion)  # test
 '''
 
-
+'''
+start
+'''
 #midi = midi.MIDIthread();
 #midi.start();
 
-# draw fretboard
-change_scale(selectedRoot.get())
+# draw
+update_ui()
 
 # start the window
-window.mainloop()
+tk_main_window.mainloop()

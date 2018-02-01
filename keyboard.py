@@ -4,18 +4,50 @@ import music
 import util
 
 
+white_key_notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+black_key_notes = ['C#', 'D#', 'F#', 'G#', 'A#']
+
+'''
+
+class Key:
+    def __init__(self, note, octave, rectangle_widget_id):
+        if note in white_key_notes:
+            self.key = 'white'
+        else:
+            self.key = 'black'
+        
+        self.note = music.Note(note, octave)
+        
+
+'''
+
+
 class Keyboard:
     def __init__(self, window, w, h):
         self.canvas = tkinter.Canvas(window, width=w, height=h, bd=2, relief=tkinter.SOLID)
         self.triad = None
+
+    def object_click(self, event):
+        item = event.widget.find_closest(event.x, event.y)
+        print('event click', event.x, event.y, item)
+        self.canvas.itemconfigure(item, fill='#333333')
+
+        # hmm, look at: find_overlapping(x1, y1, x2, y2)
+
+    def object_release(self, event):
+        item = event.widget.find_closest(event.x, event.y)
+        print('event release', event.x, event.y, item)
+
+        self.canvas.itemconfigure(item, fill='white')
+
+        # hmm, look at: find_overlapping(x1, y1, x2, y2)
 
     def draw(self):
         print('rendering piano')
         starting_octave = 1
         # per octave
         white_keys = 7
-        white_key_notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
-        black_key_notes = ['C#', 'D#', 'F#', 'G#', 'A#']
+
         # black_keys = 5
         keyspan_octave = ['w', 'b', 'w', 'b', 'w', 'w', 'b', 'w', 'b', 'w', 'b', 'w']
         black_keys = [1, 2, 4, 5, 6]
@@ -35,12 +67,14 @@ class Keyboard:
                     color_key = color_note
                     color_note = 'black'
 
-            self.canvas.create_rectangle(pos_x,
-                                         0,
-                                         pos_x + key_width,
-                                         int(self.canvas["height"]) + 4,
-                                         fill=color_key, activefill=color_note)
+            object_id = self.canvas.create_rectangle(pos_x,
+                                                     0,
+                                                     pos_x + key_width,
+                                                     int(self.canvas["height"]) + 4,
+                                                     fill=color_key) #, activefill=color_note)
 
+            self.canvas.tag_bind(object_id, '<ButtonPress-1>', self.object_click)
+            self.canvas.tag_bind(object_id, '<ButtonRelease-1>', self.object_release)
             self.canvas.create_text(pos_x+key_width/2, int(self.canvas["height"])-10, text=note, fill=color_note)
 
         black_width = key_width * 0.7
@@ -72,3 +106,4 @@ class Keyboard:
         print(width)
         print(height)
         self.canvas.create_rectangle(0, 0, width, height, fill='black')'''
+
