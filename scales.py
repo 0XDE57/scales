@@ -3,6 +3,7 @@ import tkinter
 import music
 import fretboard
 import keyboard
+import waveform
 import midi
 
 # TODO
@@ -56,6 +57,8 @@ def update_ui(*args):
 
     piano.triad = triad
     piano.draw()
+
+    wave.draw()
 
 
 '''
@@ -119,6 +122,15 @@ piano = keyboard.Keyboard(tk_labelframe_piano_group, 800, 150)
 piano.canvas.pack()
 tk_labelframe_piano_group.pack()
 
+# frequency
+# TODO: this is place holder test, embed pyplot instead
+# https://matplotlib.org/gallery/user_interfaces/embedding_in_tk_canvas_sgskip.html
+# https://www.youtube.com/watch?v=spUNpyF58BY
+# https://www.quora.com/Why-do-certain-musical-notes-sound-good-together-What-is-the-relationship-between-the-frequencies-of-their-waves
+tk_labelframe_waveform_group = tkinter.LabelFrame(tk_main_window, text="waveform")
+wave = waveform.WaveForm(tk_labelframe_waveform_group, 800, 150)
+wave.canvas.pack()
+tk_labelframe_waveform_group.pack()
 '''
 mouse_x, mouse_y = 0, 0
 def motion(event):

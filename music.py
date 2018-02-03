@@ -21,12 +21,18 @@ c2_freq = 65.40639
 a4_freq = 440.0
 a4_key_MIDI = 69
 
+
 class Note:
     def __init__(self, note, octave):
         self.note = note
         self.octave = octave
-        # self.frequency =
-        # self.cents =
+        self.frequency = frequencyMap[note + str(octave)]
+        self.cents = 0
+
+        diff_oct = (octave - 4) * 12
+        diff_note = notes.index(note) - notes.index('A')
+        self.midi_id = a4_key_MIDI + (diff_note + diff_oct)
+
 
 def cents_from_frequency(freq):
     # C2 used as base "Low C"
@@ -61,7 +67,7 @@ def frequency_to_note(freq):
     octave = math.floor(note_num / 12) + base_octave
     note = notes[note_num % 12]
 
-    # print(note + str(octave) + ":" + str(cents))
+    #print(note + str(octave) + ":" + str(cents))
     return note + str(octave)
 
 
@@ -105,4 +111,4 @@ def get_triad(root, scale):
             #scale[(root + 6) % len(scale)]]  # seventh
 
 
-
+frequencyMap = create_freq_map()

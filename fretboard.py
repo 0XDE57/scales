@@ -13,7 +13,6 @@ class Fretboard:
         self.fret_spacing = 28  # how far apart to draw notes (horizontal)
         self.string_spacing = 20  # how far apart to draw strings (vertical)
 
-        self.note_map = music.create_freq_map()
         self.show_freq = False
         self.triad = None
 
@@ -35,7 +34,7 @@ class Fretboard:
             # get note based on string position(fret),
             fret_oct = octave + math.floor((note_string + fret) / len(music.notes))
             fret_note = music.notes[(note_string + fret) % len(music.notes)]
-            fret_frequency = str(round(self.note_map[fret_note + str(fret_oct)]))
+            fret_frequency = str(round(music.frequencyMap[fret_note + str(fret_oct)]))
 
             color = util.get_color_for_octave(fret_oct)
             # canvas.create_rectangle(pos_x - radius, pos_y - radius, pos_x + radius, pos_y + radius, fill=color)
