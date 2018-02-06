@@ -4,22 +4,41 @@ import math
 notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
 # modes/diatonic scale: Ionian, Dorian, Phrygian, Lydian, Mixolydian, Aeolian, Locrian
-mode_ionian     = [2, 2, 1, 2, 2, 2, 1]  # major
-mode_dorian     = [2, 1, 2, 2, 2, 1, 2]
-mode_phrygian   = [1, 2, 2, 2, 1, 2, 2]
-mode_lydian     = [2, 2, 2, 1, 2, 2, 1]
-mode_mixolydian = [2, 2, 1, 2, 2, 1, 2]  # dominant
-mode_aeolian    = [2, 1, 2, 2, 1, 2, 2]  # natural minor
-mode_locrian    = [1, 2, 2, 1, 2, 2, 2]
+# whole/half      [w, w, h, w, w, w, h]
+# tone/semi       [T, T, S, T, T, T, S]
+#mode_ionian     = [2, 2, 1, 2, 2, 2, 1]  # major
+#mode_dorian     = [2, 1, 2, 2, 2, 1, 2]
+#mode_phrygian   = [1, 2, 2, 2, 1, 2, 2]
+#mode_lydian     = [2, 2, 2, 1, 2, 2, 1]
+#mode_mixolydian = [2, 2, 1, 2, 2, 1, 2]  # dominant
+#mode_aeolian    = [2, 1, 2, 2, 1, 2, 2]  # natural minor | relative minor
+#mode_locrian    = [1, 2, 2, 1, 2, 2, 2]
 
-intervals = [2, 2, 1, 2, 2, 2, 1]
-# whole/half[w, w, h, w, w, w, h]
-# tone/semi [T, T, S, T, T, T, S]
+#if aeolian and C -> c-minor
+
+modes = {'Ionian':      [2, 2, 1, 2, 2, 2, 1],  # major
+         'Dorian':      [2, 1, 2, 2, 2, 1, 2],
+         'Phrygian':    [1, 2, 2, 2, 1, 2, 2],
+         'Lydian':      [2, 2, 2, 1, 2, 2, 1],
+         'Mixolydian':  [2, 2, 1, 2, 2, 1, 2],  # dominant
+         'Aeolian':     [2, 1, 2, 2, 1, 2, 2],  # natural minor | relative minor
+         'Locrian':     [1, 2, 2, 1, 2, 2, 2]}
+
 
 # predefined notes used for calculation: conforms to IPN (International Pitch Notation)
 c2_freq = 65.40639
 a4_freq = 440.0
 a4_key_MIDI = 69
+
+
+scale_degrees = ['tonic',
+                 'supertonic',
+                 'mediant',
+                 'subdominant',
+                 'dominant',
+                 'submediant',
+                 'leading tone',
+                 'tonic octive']
 
 
 class Note:
@@ -91,12 +110,12 @@ def create_freq_map():
     return frequency_map  # sorted(frequency_map.items(), key=lambda x: x[1])
 
 
-# generate major scale
-def get_scale(root):  # actually change key, scale is same, key is different?
+# generate scale
+def get_mode_of_scale(key_signature, mode_intervals):
     new_scale = []
-    note = notes.index(root.upper())
-    for x in range(len(intervals)):
-        offset = intervals[x % len(intervals)]
+    note = notes.index(key_signature.upper())
+    for x in range(len(mode_intervals)):
+        offset = mode_intervals[x % len(mode_intervals)]
         new_scale.append(notes[note % len(notes)])
         note += offset
 
@@ -105,10 +124,11 @@ def get_scale(root):  # actually change key, scale is same, key is different?
 
 # create triad chord
 def get_triad(root, scale):
+    # root = key_signature
     return [scale[(root + 0) % len(scale)],  # root | tonic
-            scale[(root + 2) % len(scale)],  # third
+            scale[(root + 2) % len(scale)],  # third | mediant
             scale[(root + 4) % len(scale)]]  # fifth | dominant
-            #scale[(root + 6) % len(scale)]]  # seventh
+            #scale[(root + 6) % len(scale)]]  # seventh | leading tone
 
 
 frequencyMap = create_freq_map()

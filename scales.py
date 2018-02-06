@@ -1,3 +1,5 @@
+import sys
+
 import tkinter
 
 import music
@@ -35,15 +37,34 @@ fret -> text widget with circle / rect outline, hmm...
 '''
 
 
+class EmbeddedConsole:
+    def __init__(self, window):
+        self.frame = tkinter.Frame(window)
+        self.entry = tkinter.Entry(self.frame)
+        self.entry.pack()
+        self.doIt = tkinter.Button(self.frame, text="DoIt", command=self.onEnter)
+        self.doIt.pack()
+        self.output = tkinter.Text(self.frame)
+        self.output.pack()
+        sys.stdout = self
+
+    def onEnter(self):
+        print(eval(self.entry.get()))
+
+    def write(self, txt):
+        self.output.insert('end', str(txt))
+
+
 def update_ui(*args):
     scale_tonic_note = tk_stringvar_selected_tonic.get()
+    mode = tk_mode.get()
 
     global cur_scale
-    cur_scale = music.get_scale(scale_tonic_note)
+    cur_scale = music.get_mode_of_scale(scale_tonic_note, music.modes[mode])
     triad = music.get_triad(cur_scale.index(scale_tonic_note), cur_scale)
 
     print(scale_tonic_note + ' -> ' + str(triad))
-    print('in key: ' + str(cur_scale))
+    print('mode: ' + mode + '' + str(cur_scale))
 
     tk_entry_scale_text.delete(0, 'end')
     tk_entry_scale_text.insert(0, cur_scale)
@@ -65,7 +86,8 @@ def update_ui(*args):
 init 
 '''
 tk_main_window = tkinter.Tk()  # create window
-cur_scale = music.get_scale('C')  # initialize with c major
+# console = EmbeddedConsole(tk_main_window)
+#cur_scale = music.get_mode_of_scale('C', music.mode_ionian)  # initialize with c major
 
 
 '''
@@ -79,6 +101,10 @@ tk_stringvar_selected_tonic = tkinter.StringVar()
 tk_stringvar_selected_tonic.set(music.notes[music.notes.index('C')])  # init with C (c major scale)
 tk_optionmenu_tonic_selection = tkinter.OptionMenu(tk_labelframe_options, tk_stringvar_selected_tonic, *music.notes, command=update_ui)
 tk_optionmenu_tonic_selection.pack()
+tk_mode = tkinter.StringVar()
+tk_mode.set(next(iter(music.modes.keys())))
+tk_optionmenu_mode_selection = tkinter.OptionMenu(tk_labelframe_options, tk_mode, *music.modes.keys(), command=update_ui)
+tk_optionmenu_mode_selection.pack()
 
 # scale and triad display
 tk_entry_triad_text = tkinter.Entry(tk_labelframe_options)
@@ -114,6 +140,7 @@ tk_labelframe_guitar_group.pack()
 
 # piano
 # TODO:
+# [ ] toggle show frequency
 # [ ] number of octaves
 # [ ] toggle color octave
 # [ ] starting octave
@@ -127,10 +154,15 @@ tk_labelframe_piano_group.pack()
 # https://matplotlib.org/gallery/user_interfaces/embedding_in_tk_canvas_sgskip.html
 # https://www.youtube.com/watch?v=spUNpyF58BY
 # https://www.quora.com/Why-do-certain-musical-notes-sound-good-together-What-is-the-relationship-between-the-frequencies-of-their-waves
+# https://www.youtube.com/watch?v=JDFa8TSn6vY
 tk_labelframe_waveform_group = tkinter.LabelFrame(tk_main_window, text="waveform")
 wave = waveform.WaveForm(tk_labelframe_waveform_group, 800, 150)
 wave.canvas.pack()
 tk_labelframe_waveform_group.pack()
+
+
+#console.frame.pack()
+
 '''
 mouse_x, mouse_y = 0, 0
 def motion(event):
@@ -148,6 +180,11 @@ start
 '''
 #midi = midi.MIDIthread();
 #midi.start();
+
+for note in music.notes:
+    print('Key sig = ' + note)
+    for mode in music.modes.keys():
+        print('\t' + str(mode) + ' -> ' + str(music.get_mode_of_scale(note, music.modes[mode])))
 
 # draw
 update_ui()
