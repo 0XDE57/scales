@@ -178,7 +178,7 @@ canvas.bind('<Motion>', motion)  # test
 '''
 start
 '''
-#midi = midi.MIDIthread();
+midi = midi.MIDI()
 #midi.start();
 
 for note in music.notes:

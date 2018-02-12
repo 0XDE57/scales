@@ -34,7 +34,6 @@ class Fretboard:
             # get note based on string position(fret),
             fret_oct = octave + math.floor((note_string + fret) / len(music.notes))
             fret_note = music.notes[(note_string + fret) % len(music.notes)]
-            fret_frequency = str(round(music.frequencyMap[fret_note + str(fret_oct)]))
 
             color = util.get_color_for_octave(fret_oct)
             # canvas.create_rectangle(pos_x - radius, pos_y - radius, pos_x + radius, pos_y + radius, fill=color)
@@ -53,6 +52,7 @@ class Fretboard:
 
             # show frequency
             if self.show_freq:
+                fret_frequency = str(round(music.note_map[fret_note + str(fret_oct)].frequency))
                 self.canvas.create_text(pos_x, pos_y+7, text=fret_frequency, font=("Purisa", 9), fill='white')
 
 

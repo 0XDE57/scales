@@ -3,19 +3,9 @@ import math
 # define music notes
 notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
-# modes/diatonic scale: Ionian, Dorian, Phrygian, Lydian, Mixolydian, Aeolian, Locrian
-# whole/half      [w, w, h, w, w, w, h]
-# tone/semi       [T, T, S, T, T, T, S]
-#mode_ionian     = [2, 2, 1, 2, 2, 2, 1]  # major
-#mode_dorian     = [2, 1, 2, 2, 2, 1, 2]
-#mode_phrygian   = [1, 2, 2, 2, 1, 2, 2]
-#mode_lydian     = [2, 2, 2, 1, 2, 2, 1]
-#mode_mixolydian = [2, 2, 1, 2, 2, 1, 2]  # dominant
-#mode_aeolian    = [2, 1, 2, 2, 1, 2, 2]  # natural minor | relative minor
-#mode_locrian    = [1, 2, 2, 1, 2, 2, 2]
-
-#if aeolian and C -> c-minor
-
+# mode intervals
+# whole/half            [w, w, h, w, w, w, h]
+# tone/semi             [T, T, S, T, T, T, S]
 modes = {'Ionian':      [2, 2, 1, 2, 2, 2, 1],  # major
          'Dorian':      [2, 1, 2, 2, 2, 1, 2],
          'Phrygian':    [1, 2, 2, 2, 1, 2, 2],
@@ -24,6 +14,7 @@ modes = {'Ionian':      [2, 2, 1, 2, 2, 2, 1],  # major
          'Aeolian':     [2, 1, 2, 2, 1, 2, 2],  # natural minor | relative minor
          'Locrian':     [1, 2, 2, 1, 2, 2, 2]}
 
+#if aeolian and C -> c-minor
 
 # predefined notes used for calculation: conforms to IPN (International Pitch Notation)
 c2_freq = 65.40639
@@ -42,15 +33,21 @@ scale_degrees = ['tonic',
 
 
 class Note:
-    def __init__(self, note, octave):
-        self.note = note
+    def __init__(self, note, octave, frequency, cents, midi):
+        self.note_letter = note
         self.octave = octave
-        self.frequency = frequencyMap[note + str(octave)]
-        self.cents = 0
+        self.frequency = frequency
+        self.cents = cents
+        self.midi_ID = midi
 
-        diff_oct = (octave - 4) * 12
-        diff_note = notes.index(note) - notes.index('A')
-        self.midi_id = a4_key_MIDI + (diff_note + diff_oct)
+    def get_note(self, freq):
+        if freq:
+            return self.note_letter + str(round(self.frequency, 2))
+        else:
+            return self.note_letter + str(self.octave)
+
+    def to_string(self):
+        return "{0:4} {1} [{3}]".format(self.get_note(False), round(self.frequency, 2), self.cents, self.midi_ID)
 
 
 def cents_from_frequency(freq):
@@ -62,7 +59,7 @@ def cents_from_frequency(freq, base_freq):
     return (math.log(freq) - math.log(base_freq)) * 1200.0 * math.log2(math.e)
 
 
-def frequency_to_note(freq):
+def frequency_to_note(freq, midi_note):
     base_freq = c2_freq
     base_octave = 2
     total_cents = cents_from_frequency(freq, base_freq)
@@ -84,30 +81,33 @@ def frequency_to_note(freq):
 
     cents = abs(cents)
     octave = math.floor(note_num / 12) + base_octave
-    note = notes[note_num % 12]
+    note_letter = notes[note_num % 12]
 
-    #print(note + str(octave) + ":" + str(cents))
-    return note + str(octave)
+    return Note(note=note_letter, octave=octave, frequency=freq, cents=cents, midi=midi_note)
 
 
-def create_freq_map():
-    frequency_map = {}
+def generate_notes():
+    note_map = {}
 
-    for key_number in range(len(notes) * 9):
+    for midi_note in range(len(notes) * 9):
         # twelfth root of two
         # represents the frequency ratio of a semitone in twelve-tone equal temperament
-        frequency = math.pow(2, (key_number - a4_key_MIDI) / 12) * a4_freq
-        note = frequency_to_note(frequency)
-        frequency_map[note] = frequency
+        frequency = math.pow(2, (midi_note - a4_key_MIDI) / 12) * a4_freq
+        note = frequency_to_note(frequency, midi_note)
+        note_map[midi_note] = note
+        if 'C' in note.note_letter and '#' not in note.note_letter:
+            print("")
+        print(note.to_string())
+
 
     print('-' * 30)
-    for key, value in frequency_map.items():
-        if 'C' in key and '#' not in key:
+    for key, value in note_map.items():
+        if 'C' in value.note_letter and '#' not in value.note_letter:
             print("")
-        print("{0:4} {1}".format(key, round(value, 3)))
+        print("{0:4} {1}".format(key, value.to_string()))
     print('----')
 
-    return frequency_map  # sorted(frequency_map.items(), key=lambda x: x[1])
+    return note_map
 
 
 # generate scale
@@ -131,4 +131,4 @@ def get_triad(root, scale):
             #scale[(root + 6) % len(scale)]]  # seventh | leading tone
 
 
-frequencyMap = create_freq_map()
+note_map = generate_notes()
