@@ -79,7 +79,22 @@ def update_ui(*args):
     piano.triad = triad
     piano.draw()
 
-    wave.draw()
+    #wave.draw()
+
+
+def callback(message, time_stamp):
+    midi_type = message[0]
+    midi_note = message[1]
+    midi_velocity = message[2]
+
+    if midi_type == 144:
+        if midi_velocity == 0:
+            print('Off: ' + music.note_map[midi_note].to_string())
+        else:
+            print('On:  ' + music.note_map[midi_note].to_string() + ' -> ' + str(midi_velocity))
+            wave.draw(music.note_map[midi_note].frequency)
+    else:
+        print(str(message))
 
 
 '''
@@ -87,7 +102,6 @@ init
 '''
 tk_main_window = tkinter.Tk()  # create window
 # console = EmbeddedConsole(tk_main_window)
-#cur_scale = music.get_mode_of_scale('C', music.mode_ionian)  # initialize with c major
 
 
 '''
@@ -178,8 +192,8 @@ canvas.bind('<Motion>', motion)  # test
 '''
 start
 '''
-midi = midi.MIDI()
-#midi.start();
+midi = midi.MIDI(callback)
+
 
 for note in music.notes:
     print('Key sig = ' + note)

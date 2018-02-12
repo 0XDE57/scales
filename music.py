@@ -14,13 +14,10 @@ modes = {'Ionian':      [2, 2, 1, 2, 2, 2, 1],  # major
          'Aeolian':     [2, 1, 2, 2, 1, 2, 2],  # natural minor | relative minor
          'Locrian':     [1, 2, 2, 1, 2, 2, 2]}
 
-#if aeolian and C -> c-minor
-
 # predefined notes used for calculation: conforms to IPN (International Pitch Notation)
 c2_freq = 65.40639
 a4_freq = 440.0
 a4_key_MIDI = 69
-
 
 scale_degrees = ['tonic',
                  'supertonic',
@@ -99,13 +96,13 @@ def generate_notes():
             print("")
         print(note.to_string())
 
-
+    '''
     print('-' * 30)
     for key, value in note_map.items():
         if 'C' in value.note_letter and '#' not in value.note_letter:
             print("")
         print("{0:4} {1}".format(key, value.to_string()))
-    print('----')
+    print('----')'''
 
     return note_map
 
