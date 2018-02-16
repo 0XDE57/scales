@@ -9,14 +9,16 @@ import waveform
 import midi
 
 # TODO
-# [...] piano canvas
-# [ ] midi input/output
-# [...] note highlight linking between keyboard and fretboard to display 1-1 mapping
-# [ ] mode selection -> shifting intervals (Ionian,Dorian,Phrygian,etc...)
+# [ ] fix notation, eg: D Phrygian: [D D# F G A A# C] should be [D Eb F G A Bb C], check circle of fifths,
+#     number of sharps and flats. the notes are still technically correct as they are the same
+#     (at least in an equal-temperment scale, perhaps not in pythagorean scale as far as I currently understand?)
+# [...] midi input/output
+# [...] note highlight linking between keyboard and fretboard and waveform to display 1-1 mapping
+# [ ] keyboard and fretboard canvas objects should be event based instead of re-added each change -> memory leak
 # [ ] options for instruments
 # [ ] circle of fifths canvas
 # [ ] note/staff canvas
-# [ ] waveform canvas (sine)
+# [...] waveform canvas (sine)
 # [ ] sine wave generation
 # [ ] clean up UI layout
 # [ ] research
@@ -42,7 +44,7 @@ class EmbeddedConsole:
         self.frame = tkinter.Frame(window)
         self.entry = tkinter.Entry(self.frame)
         self.entry.pack()
-        self.doIt = tkinter.Button(self.frame, text="DoIt", command=self.onEnter)
+        self.doIt = tkinter.Button(self.frame, text="Execute", command=self.onEnter)
         self.doIt.pack()
         self.output = tkinter.Text(self.frame)
         self.output.pack()
@@ -79,7 +81,6 @@ def update_ui(*args):
     piano.triad = triad
     piano.draw()
 
-    #wave.draw()
 
 
 def callback(message, time_stamp):
@@ -92,7 +93,10 @@ def callback(message, time_stamp):
             print('Off: ' + music.note_map[midi_note].to_string())
         else:
             print('On:  ' + music.note_map[midi_note].to_string() + ' -> ' + str(midi_velocity))
-            wave.draw(music.note_map[midi_note].frequency)
+            wave.scale = tk_wave_scale_slider.get()
+            wave.frequency = music.note_map[midi_note].frequency
+            #wave.draw(music.note_map[midi_note].frequency)
+            #tk_main_window.update()
     else:
         print(str(message))
 
@@ -164,43 +168,42 @@ piano.canvas.pack()
 tk_labelframe_piano_group.pack()
 
 # frequency
-# TODO: this is place holder test, embed pyplot instead
-# https://matplotlib.org/gallery/user_interfaces/embedding_in_tk_canvas_sgskip.html
+# TODO:
+# [ ] embed pyplot instead?
+#       - https://matplotlib.org/gallery/user_interfaces/embedding_in_tk_canvas_sgskip.html
+# [ ] display multi-note combined wave -> sum
+# [ ] option to center frequency instead of starting from left
+# [ ] option to animate, roll the frequency
+# [ ] option for velocity sensitive amplitude
+# [ ] play with alternate wave function eg multiply, subtract instead of sum
+# [ ] fourier transform to split sum wave, display visualizer/frequency gragh
+#
 # https://www.youtube.com/watch?v=spUNpyF58BY
 # https://www.quora.com/Why-do-certain-musical-notes-sound-good-together-What-is-the-relationship-between-the-frequencies-of-their-waves
 # https://www.youtube.com/watch?v=JDFa8TSn6vY
 tk_labelframe_waveform_group = tkinter.LabelFrame(tk_main_window, text="waveform")
-wave = waveform.WaveForm(tk_labelframe_waveform_group, 800, 150)
+wave = waveform.WaveForm(tk_main_window, tk_labelframe_waveform_group, 800, 150)
 wave.canvas.pack()
+tk_wave_scale_slider = tkinter.Scale(tk_labelframe_waveform_group, from_=100, to=10000, orient='horizontal')
+tk_wave_scale_slider.set(4000)
+tk_wave_scale_slider.pack()
 tk_labelframe_waveform_group.pack()
-
 
 #console.frame.pack()
 
 '''
-mouse_x, mouse_y = 0, 0
-def motion(event):
-    global mouse_x, mouse_y
-    mouse_x = event.x
-    mouse_y = event.y
-    # print('{}, {}'.format(mouse_x, mouse_y))
-    draw_fretboard(selectedRoot.get())
-
-canvas.bind('<Motion>', motion)  # test
-'''
-
-'''
 start
 '''
-midi = midi.MIDI(callback)
+wave.draw()  # start async event loop to render
+midi = midi.MIDI(callback)  # init mid, if found open and wait for events
 
-
+# debug print scale,mode possibilities
 for note in music.notes:
     print('Key sig = ' + note)
     for mode in music.modes.keys():
         print('\t' + str(mode) + ' -> ' + str(music.get_mode_of_scale(note, music.modes[mode])))
 
-# draw
+# init ui
 update_ui()
 
 # start the window
