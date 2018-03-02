@@ -1,18 +1,18 @@
 import math
 
 # define music notes
-notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+notes = ('C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B')
 
 # mode intervals
 # whole/half            [w, w, h, w, w, w, h]
 # tone/semi             [T, T, S, T, T, T, S]
-modes = {'Ionian':      [2, 2, 1, 2, 2, 2, 1],  # major
-         'Dorian':      [2, 1, 2, 2, 2, 1, 2],
-         'Phrygian':    [1, 2, 2, 2, 1, 2, 2],
-         'Lydian':      [2, 2, 2, 1, 2, 2, 1],
-         'Mixolydian':  [2, 2, 1, 2, 2, 1, 2],  # dominant
-         'Aeolian':     [2, 1, 2, 2, 1, 2, 2],  # natural minor | relative minor
-         'Locrian':     [1, 2, 2, 1, 2, 2, 2]}
+modes = {'Ionian':      (2, 2, 1, 2, 2, 2, 1),  # major
+         'Dorian':      (2, 1, 2, 2, 2, 1, 2),
+         'Phrygian':    (1, 2, 2, 2, 1, 2, 2),
+         'Lydian':      (2, 2, 2, 1, 2, 2, 1),
+         'Mixolydian':  (2, 2, 1, 2, 2, 1, 2),  # dominant
+         'Aeolian':     (2, 1, 2, 2, 1, 2, 2),  # natural minor | relative minor
+         'Locrian':     (1, 2, 2, 1, 2, 2, 2)}
 
 # predefined notes used for calculation: conforms to IPN (International Pitch Notation)
 c2_freq = 65.40639
