@@ -85,6 +85,9 @@ def update_ui(*args):
 
 def callback(message, time_stamp):
     # TODO: look up midi types and message ID's
+    print(str(message))
+    # 144 = note on
+    # 128 = note off
     # 176 = modifier/knob?
     midi_type = message[0]
     midi_note = message[1]
@@ -106,8 +109,6 @@ def callback(message, time_stamp):
         note_pressed = music.note_map[midi_note]
         print('Off: ' + note_pressed.to_string())
         wave.active_notes.remove(note_pressed)
-    else:
-        print(str(message))
 
 
 '''
