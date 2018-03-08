@@ -95,26 +95,23 @@ def callback(message, time_stamp):
 
     if midi_type == 144:
         note_pressed = music.note_map[midi_note]
-        if midi_velocity == 0:
-            print('Off: ' + note_pressed.to_string())
-            wave.active_notes.remove(note_pressed)
-        else:
-            print('On:  ' + note_pressed.to_string() + ' -> ' + str(midi_velocity))
-            wave.scale = tk_wave_scale_slider.get()
-            if note_pressed not in wave.active_notes:
-                wave.active_notes.append(note_pressed)
-            #wave.draw(music.note_map[midi_note].frequency)
-            #tk_main_window.update()
+        print('On:  ' + note_pressed.to_string() + ' -> ' + str(midi_velocity))
+        wave.scale = tk_wave_scale_slider.get()
+        if note_pressed not in wave.active_notes:
+            wave.active_notes.append(note_pressed)
+
     elif midi_type == 128:
         note_pressed = music.note_map[midi_note]
         print('Off: ' + note_pressed.to_string())
-        wave.active_notes.remove(note_pressed)
+        #wave.active_notes.remove(note_pressed)
+
 
 
 '''
 init 
 '''
 tk_main_window = tkinter.Tk()  # create window
+tk_main_window.configure(background="red")
 # console = EmbeddedConsole(tk_main_window)
 
 
@@ -194,8 +191,8 @@ tk_labelframe_piano_group.pack()
 tk_labelframe_waveform_group = tkinter.LabelFrame(tk_main_window, text="waveform")
 wave = waveform.WaveForm(tk_main_window, tk_labelframe_waveform_group, 800, 150)
 wave.canvas.pack()
-tk_wave_scale_slider = tkinter.Scale(tk_labelframe_waveform_group, from_=100, to=10000, orient='horizontal')
-tk_wave_scale_slider.set(4000)
+tk_wave_scale_slider = tkinter.Scale(tk_labelframe_waveform_group, from_=1, to=20000, orient='horizontal', length=800)
+tk_wave_scale_slider.set(100)
 tk_wave_scale_slider.pack()
 tk_labelframe_waveform_group.pack()
 

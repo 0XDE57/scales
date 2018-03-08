@@ -17,6 +17,7 @@ class WaveForm:
         self.active_notes = []
 
     def draw(self):
+
         if len(self.active_notes) == 0:
             self.canvas.delete('all')
             self.tk_mainwindow.after(1, self.draw)
@@ -24,6 +25,7 @@ class WaveForm:
 
         canvas_width = int(self.canvas["width"])
         canvas_height = int(self.canvas["height"])
+        #self.canvas.create_rectangle(0, 0, canvas_width, canvas_height, fill='black')
         center = canvas_height / 4
         amplitude = int(center * 0.9)
 
@@ -41,11 +43,12 @@ class WaveForm:
         self.canvas.delete('all')
         pos = 1
         sin_wave_sum = []
+        phase_offset = math.radians(270)
         for note in self.active_notes:
             sin_wave = []
             for x in range(int(canvas_width)):
                 sin_wave.append(x)  # x
-                y = int(math.sin(x * (note.frequency/self.scale)) * amplitude) + center
+                y = int(math.sin(x * (note.frequency/self.scale) + phase_offset) * amplitude) + center
                 sin_wave.append(y)  # y
 
                 y += center*2
@@ -58,12 +61,20 @@ class WaveForm:
 
             #print(sin_wave)
             pos += 1
+            color = util.get_color_for_octave(pos)#misleading use, not actualy octave, just using key index
             self.canvas.create_line(0, center, canvas_width, center, fill='black')
-            self.canvas.create_line(sin_wave, fill=util.get_color_for_octave(pos))
-            self.canvas.create_text(10, pos*12, text=str(round(note.frequency, 2)), anchor='w')
+            self.canvas.create_line(sin_wave, fill=color)
+
+        pos = 1
+        for note in self.active_notes:
+            self.canvas.create_text(10, pos * 12, text=note.to_string(), anchor='w', fill='black')
+            pos += 1
 
         #print(sin_wave_sum)
-        self.canvas.create_line(sin_wave_sum, fill='black')
+        try:
+            self.canvas.create_line(sin_wave_sum, fill='black')
+        except:
+            print(sin_wave_sum)  # TODO: fix. somethings wrong
 
         #print("draw freq:{0} at scale:{1} -> sin_wave={2}".format(round(self.frequency, 2), self.scale, len(sin_wave)/2))
         self.tk_mainwindow.after(1, self.draw)
