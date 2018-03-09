@@ -85,6 +85,7 @@ def update_ui(*args):
 
 def callback(message, time_stamp):
     # TODO: look up midi types and message ID's
+    # looks like some midi keyboard use type 144 and velocity 0 for off, while others use type 128 for off
     print(str(message))
     # 144 = note on
     # 128 = note off
@@ -93,17 +94,21 @@ def callback(message, time_stamp):
     midi_note = message[1]
     midi_velocity = message[2]
 
+    wave.scale = tk_wave_scale_slider.get()
     if midi_type == 144:
         note_pressed = music.note_map[midi_note]
-        print('On:  ' + note_pressed.to_string() + ' -> ' + str(midi_velocity))
-        wave.scale = tk_wave_scale_slider.get()
-        if note_pressed not in wave.active_notes:
-            wave.active_notes.append(note_pressed)
+        if midi_velocity > 0:
+            print('On:  ' + note_pressed.to_string() + ' -> ' + str(midi_velocity))
+            if note_pressed not in wave.active_notes:
+                wave.active_notes.append(note_pressed)
+        else:
+            print('Off: ' + note_pressed.to_string())
+            wave.active_notes.remove(note_pressed)
 
     elif midi_type == 128:
         note_pressed = music.note_map[midi_note]
         print('Off: ' + note_pressed.to_string())
-        #wave.active_notes.remove(note_pressed)
+        wave.active_notes.remove(note_pressed)
 
 
 
