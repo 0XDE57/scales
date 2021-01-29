@@ -1,22 +1,21 @@
-import rtmidi_python as rtmidi
-import music
+import rtmidi
 
 
 class MIDI:
     def __init__(self, callback):
         self.midi_opened = False
 
-        self.midi_in = rtmidi.MidiIn(b'in')  # fixed for python3 via: https://github.com/superquadratic/rtmidi-python/issues/17
+        self.midi_in = rtmidi.MidiIn()
 
-        if not self.midi_in.ports:
+        if not self.midi_in.get_ports():
             print('No midi devices found.')
             return
         else:
             print('detected midi devices:')
-            for x in self.midi_in.ports:
+            for x in self.midi_in.get_ports():
                 print(x)
 
-        self.midi_in.callback = callback # self.callback
+        self.midi_in.set_callback(callback)
         self.midi_in.open_port(0)
 
 

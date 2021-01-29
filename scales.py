@@ -82,11 +82,12 @@ def update_ui(*args):
     piano.draw()
 
 
-
-def callback(message, time_stamp):
+def midi_input_handler(event, data=None):
+    message = event[0]
+    timestamp = event[1]
     # TODO: look up midi types and message ID's
     # looks like some midi keyboard use type 144 and velocity 0 for off, while others use type 128 for off
-    print(str(message))
+    print(str(timestamp) + ' ' + str(message))
     # 144 = note on
     # 128 = note off
     # 176 = modifier/knob?
@@ -207,7 +208,7 @@ tk_labelframe_waveform_group.pack()
 start
 '''
 wave.draw()  # start async event loop to render
-midi = midi.MIDI(callback)  # init mid, if found open and wait for events
+midi = midi.MIDI(midi_input_handler)  # init mid, if found open and wait for events
 
 # debug print scale,mode possibilities
 for note in music.notes:
