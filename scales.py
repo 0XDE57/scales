@@ -1,4 +1,3 @@
-import sys
 
 import tkinter
 
@@ -7,6 +6,7 @@ import fretboard
 import keyboard
 import waveform
 import midi
+import embeddedconsole
 
 # TODO
 # [ ] fix notation, eg: D Phrygian: [D D# F G A A# C] should be [D Eb F G A Bb C], check circle of fifths,
@@ -37,24 +37,6 @@ note -> letter, octave, frequency, cents, midi_key
 key -> rectangle widget, note, state(highlight, focus, click, 
 fret -> text widget with circle / rect outline, hmm...
 '''
-
-
-class EmbeddedConsole:
-    def __init__(self, window):
-        self.frame = tkinter.Frame(window)
-        self.entry = tkinter.Entry(self.frame)
-        self.entry.pack()
-        self.doIt = tkinter.Button(self.frame, text="Execute", command=self.onEnter)
-        self.doIt.pack()
-        self.output = tkinter.Text(self.frame)
-        self.output.pack()
-        sys.stdout = self
-
-    def onEnter(self):
-        print(eval(self.entry.get()))
-
-    def write(self, txt):
-        self.output.insert('end', str(txt))
 
 
 def update_ui(*args):
@@ -112,13 +94,12 @@ def midi_input_handler(event, data=None):
         wave.active_notes.remove(note_pressed)
 
 
-
 '''
 init 
 '''
 tk_main_window = tkinter.Tk()  # create window
 tk_main_window.configure(background="red")
-# console = EmbeddedConsole(tk_main_window)
+# console = embeddedconsole.EmbeddedConsole(tk_main_window)
 
 
 '''
@@ -202,7 +183,7 @@ tk_wave_scale_slider.set(100)
 tk_wave_scale_slider.pack()
 tk_labelframe_waveform_group.pack()
 
-#console.frame.pack()
+# console.frame.pack()
 
 '''
 start
