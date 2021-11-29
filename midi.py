@@ -14,8 +14,7 @@ class MIDI:
             print('detected midi devices:')
             for x in self.midi_in.get_ports():
                 print(x)
-
-        self.midi_in.set_callback(callback)
-        self.midi_in.open_port(0)
+            self.midi_in.set_callback(callback)
+            self.midi_in.open_port(0) # open first device
 
 
