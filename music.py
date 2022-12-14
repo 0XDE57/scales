@@ -44,27 +44,28 @@ class Note:
             return self.note_letter + str(self.octave)
 
     def to_string(self):
-        return "{0:4} {1} [{3}]".format(self.get_note(False), round(self.frequency, 2), self.cents, self.midi_ID)
+        return "| {0:4} | {1:10} | {3:4} |".format(self.get_note(False), round(self.frequency, 2), self.cents, self.midi_ID)
 
 
-def cents_from_frequency(freq):
+def frequency_to_cents(freq):
     # C2 used as base "Low C"
-    return cents_from_frequency(freq, c2_freq)
+    return frequency_to_cents(freq, c2_freq)
 
 
-def cents_from_frequency(freq, base_freq):
+def frequency_to_cents(freq, base_freq):
+    # 1200 = 12 notes * 100 cents.
     return (math.log(freq) - math.log(base_freq)) * 1200.0 * math.log2(math.e)
 
 
 def frequency_to_note(freq, midi_note):
     base_freq = c2_freq
     base_octave = 2
-    total_cents = cents_from_frequency(freq, base_freq)
+    total_cents = frequency_to_cents(freq, base_freq)
 
     while total_cents < 0:
         base_octave -= 1
         base_freq /= 2
-        total_cents = cents_from_frequency(freq, base_freq)
+        total_cents = frequency_to_cents(freq, base_freq)
 
     note_num = math.floor(total_cents / 100)
     cents = round(total_cents - (note_num * 100))
@@ -83,26 +84,20 @@ def frequency_to_note(freq, midi_note):
     return Note(note=note_letter, octave=octave, frequency=freq, cents=cents, midi=midi_note)
 
 
+def midi_note_to_frequency(midi_note):
+    # twelfth root of two = 2^(1/12) = 1.0594631
+    # represents the frequency ratio of a semitone in twelve-tone equal temperament
+    return a4_freq * math.pow(2, (midi_note - a4_key_MIDI) / 12)
+
+
 def generate_notes():
     note_map = {}
-
-    for midi_note in range(len(notes) * 9):
-        # twelfth root of two
-        # represents the frequency ratio of a semitone in twelve-tone equal temperament
-        frequency = math.pow(2, (midi_note - a4_key_MIDI) / 12) * a4_freq
+    octaves = 15
+    for midi_note in range(len(notes) * octaves):
+        frequency = midi_note_to_frequency(midi_note)
         note = frequency_to_note(frequency, midi_note)
         note_map[midi_note] = note
-        if 'C' in note.note_letter and '#' not in note.note_letter:
-            print("")
         print(note.to_string())
-
-    '''
-    print('-' * 30)
-    for key, value in note_map.items():
-        if 'C' in value.note_letter and '#' not in value.note_letter:
-            print("")
-        print("{0:4} {1}".format(key, value.to_string()))
-    print('----')'''
 
     return note_map
 
