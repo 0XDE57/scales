@@ -10,7 +10,7 @@ Documentation in the [wiki](https://github.com/0XDE57/scales/wiki/How-to-calcula
 ## dependencies
 - Python
 - tkinter
-- python-rtmidi (htps://github.com/SpotlightKid/python-rtmidi)
+- python-rtmidi (https://github.com/SpotlightKid/python-rtmidi)
 
 Tested with python 3.10 and python-rtmidi 1.4.9 
 
