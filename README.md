@@ -4,6 +4,8 @@ a simple music learning tool
 an experimental project with the goal of learning music theory, and implenting what I learn into this toy
 ![screenshot](/documentation/ui.png)
 
+## How does it work? 
+Documentation in the [wiki](/wiki/How-to-calculate-notes-and-frequencies)
 
 ## dependencies
 - Python 3
