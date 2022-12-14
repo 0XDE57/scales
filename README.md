@@ -8,16 +8,18 @@ an experimental project with the goal of learning music theory, and implenting w
 Documentation in the [wiki](https://github.com/0XDE57/scales/wiki/How-to-calculate-notes-and-frequencies%3F)
 
 ## dependencies
-- Python 3
+- Python
 - tkinter
-- [rtmidi_python](https://github.com/superquadratic/rtmidi-python)
+- python-rtmidi (https://pypi.org/project/python-rtmidi/)
 
-setup on linux may require:
+Tested with python 3.10 and python-rtmidi 1.4.9 
 
-`pip install rtmidi-python`
+Turns out there are now a couple flavours of rtmidi for python in pip with very similar package names.
+* rtmidi
+* rtmidi2: Based on rtmidi-python
+* rtmidi-python: Python wrapper for RtMidi, the lightweight, cross-platform MIDI I/O library. For Linux, Mac OS X and Windows.
+* python-rtmidi: A Python binding for the RtMidi C++ library implemented using Cython.
 
-`sudo apt-get install python3-tk`
+Installing the incorrect one will cause compile errors. 
 
-or for python 3.6:
-
-`sudo apt-get install python3.6-tk`
+In older python this used to work with **rtmidi-python**, but now runs on **python-rtmidi**. 
