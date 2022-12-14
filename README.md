@@ -5,7 +5,7 @@ an experimental project with the goal of learning music theory, and implenting w
 ![screenshot](/documentation/ui.png)
 
 ## How does it work? 
-Documentation in the [wiki](/wiki/How-to-calculate-notes-and-frequencies)
+Documentation in the [wiki](https://github.com/0XDE57/scales/wiki/How-to-calculate-notes-and-frequencies%3F)
 
 ## dependencies
 - Python 3
