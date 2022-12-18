@@ -42,7 +42,7 @@ class Keyboard:
         # hmm, look at: find_overlapping(x1, y1, x2, y2)
 
     def draw(self):
-        print('rendering piano')
+        # print('rendering piano')
         starting_octave = 1
         # per octave
         white_keys = 7

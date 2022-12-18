@@ -101,14 +101,13 @@ tk_main_window = tkinter.Tk()  # create window
 tk_main_window.configure(background="red")
 
 tk_main_window.minsize(width=700, height=600)
-frame_width = 1000 #todo: make resizable
-
+frame_width = 1000
 
 def configure_handler(event):
     print(event)
+# todo: make resizable
+# tk_main_window.bind("<Configure>", configure_handler)
 
-
-tk_main_window.bind("<Configure>", configure_handler)
 # console = embeddedconsole.EmbeddedConsole(tk_main_window)
 
 

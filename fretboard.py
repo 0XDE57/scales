@@ -37,7 +37,7 @@ class Fretboard:
         # starting note for the string
         note_string = music.notes.index(open_note)
 
-        print('drawing string: ' + open_note + str(octave))
+        # print('drawing string: ' + open_note + str(octave))
         for fret in range(len(music.notes) * 2):
             # calculate spacing between notes
             pos_x = (fret * self.fret_spacing) + x
@@ -56,12 +56,10 @@ class Fretboard:
                 self.canvas.create_text(pos_x, pos_y, text=fret_note, fill=color, activefill='white')
                 if fret_note == self.triad[0]:
                     # mark root note
-                    self.canvas.create_rectangle(pos_x - radius, pos_y - radius, pos_x + radius, pos_y + radius,
-                                                 outline=color)
+                    self.canvas.create_rectangle(pos_x - radius, pos_y - radius, pos_x + radius, pos_y + radius, outline=color)
                 else:
                     # mark triad note
-                    self.canvas.create_oval(pos_x - radius, pos_y - radius, pos_x + radius, pos_y + radius,
-                                            outline=color)
+                    self.canvas.create_oval(pos_x - radius, pos_y - radius, pos_x + radius, pos_y + radius, outline=color)
             else:
                 self.canvas.create_text(pos_x, pos_y, text=fret_note, fill='#333333', activefill='white')
 
