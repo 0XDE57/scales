@@ -30,13 +30,14 @@ scale_degrees = ['tonic',
                  'leading tone',
                  'tonic octive']
 
+
 def frequency_to_cents(freq):
-    # C2 used as base "Low C"
+    """ C2 used as base "Low C" """
     return frequency_to_cents(freq, c2_freq)
 
 
 def frequency_to_cents(freq, base_freq):
-    # 1200 = 12 notes * 100 cents.
+    """ 1200 = 12 notes * 100 cents. """
     return (math.log(freq) - math.log(base_freq)) * 1200.0 * math.log2(math.e)
 
 
@@ -68,8 +69,9 @@ def frequency_to_note(freq, midi_note):
 
 
 def midi_note_to_frequency(midi_note):
-    # twelfth root of two = 2^(1/12) = 1.0594631
-    # represents the frequency ratio of a semitone in twelve-tone equal temperament
+    """ twelfth root of two = 2^(1/12) = 1.0594631
+    This represents the frequency ratio of a semitone in twelve-tone equal temperament.
+    """
     return a4_freq * math.pow(2, (midi_note - a4_key_MIDI) / 12)
 
 
@@ -85,12 +87,12 @@ def generate_notes():
     return note_map
 
 
-# generate scale
-def get_mode_of_scale(key_signature, mode_intervals):
+def generate_scale(root_note, intervals):
+    """ build up a scale as defined by the root note as the starting point, and the intervals as steps """
     new_scale = []
-    note = notes.index(key_signature.upper())
-    for x in range(len(mode_intervals)):
-        offset = mode_intervals[x % len(mode_intervals)]
+    note = notes.index(root_note.upper())
+    for x in range(len(intervals)):
+        offset = intervals[x % len(intervals)]
         new_scale.append(notes[note % len(notes)])
         note += offset
 
@@ -103,7 +105,7 @@ def get_triad(root, scale):
     return [scale[(root + 0) % len(scale)],  # root | tonic
             scale[(root + 2) % len(scale)],  # third | mediant
             scale[(root + 4) % len(scale)]]  # fifth | dominant
-            #scale[(root + 6) % len(scale)]]  # seventh | leading tone
+    # scale[(root + 6) % len(scale)]]  # seventh | leading tone
 
 
 note_map = generate_notes()

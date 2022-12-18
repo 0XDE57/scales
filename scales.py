@@ -44,7 +44,7 @@ def update_ui(*args):
     mode = tk_mode.get()
 
     global cur_scale
-    cur_scale = music.get_mode_of_scale(scale_tonic_note, music.modes[mode])
+    cur_scale = music.generate_scale(scale_tonic_note, music.modes[mode])
     triad = music.get_triad(cur_scale.index(scale_tonic_note), cur_scale)
 
     print(scale_tonic_note + ' -> ' + str(triad))
@@ -99,6 +99,16 @@ init
 '''
 tk_main_window = tkinter.Tk()  # create window
 tk_main_window.configure(background="red")
+
+tk_main_window.minsize(width=700, height=600)
+frame_width = 1000 #todo: make resizable
+
+
+def configure_handler(event):
+    print(event)
+
+
+tk_main_window.bind("<Configure>", configure_handler)
 # console = embeddedconsole.EmbeddedConsole(tk_main_window)
 
 
@@ -143,7 +153,7 @@ add instruments
 #       - bass4 = [G2, D2, A1, E1]
 #       - base5 = [G2, D2, A1, E1, B0]
 tk_labelframe_guitar_group = tkinter.LabelFrame(tk_main_window, text='guitar')
-guitar = fretboard.Fretboard(tk_labelframe_guitar_group, 800, 150)
+guitar = fretboard.Fretboard(tk_labelframe_guitar_group, frame_width, 150)
 guitar.canvas.pack()
 tk_intvar_show_freq = tkinter.IntVar()
 tk_checkbutton_show_freq = tkinter.Checkbutton(tk_labelframe_guitar_group, text='Show Frequency', variable=tk_intvar_show_freq, command=update_ui)
@@ -157,7 +167,7 @@ tk_labelframe_guitar_group.pack()
 # [ ] toggle color octave
 # [ ] starting octave
 tk_labelframe_piano_group = tkinter.LabelFrame(tk_main_window, text="piano")
-piano = keyboard.Keyboard(tk_labelframe_piano_group, 800, 150)
+piano = keyboard.Keyboard(tk_labelframe_piano_group, frame_width, 150)
 piano.canvas.pack()
 tk_labelframe_piano_group.pack()
 
@@ -176,9 +186,9 @@ tk_labelframe_piano_group.pack()
 # https://www.quora.com/Why-do-certain-musical-notes-sound-good-together-What-is-the-relationship-between-the-frequencies-of-their-waves
 # https://www.youtube.com/watch?v=JDFa8TSn6vY
 tk_labelframe_waveform_group = tkinter.LabelFrame(tk_main_window, text="waveform")
-wave = waveform.WaveForm(tk_main_window, tk_labelframe_waveform_group, 800, 150)
+wave = waveform.WaveForm(tk_main_window, tk_labelframe_waveform_group, frame_width, 150)
 wave.canvas.pack()
-tk_wave_scale_slider = tkinter.Scale(tk_labelframe_waveform_group, from_=1, to=20000, orient='horizontal', length=800)
+tk_wave_scale_slider = tkinter.Scale(tk_labelframe_waveform_group, from_=1, to=20000, orient='horizontal', length=frame_width)
 tk_wave_scale_slider.set(100)
 tk_wave_scale_slider.pack()
 tk_labelframe_waveform_group.pack()
@@ -195,7 +205,7 @@ midi = midi.MIDI(midi_input_handler)  # init mid, if found open and wait for eve
 for note in music.notes:
     print('Key sig = ' + note)
     for mode in music.modes.keys():
-        print('\t' + str(mode) + ' -> ' + str(music.get_mode_of_scale(note, music.modes[mode])))
+        print('\t' + str(mode) + ' -> ' + str(music.generate_scale(note, music.modes[mode])))
 
 # init ui
 update_ui()
