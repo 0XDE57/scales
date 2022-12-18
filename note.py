@@ -13,4 +13,4 @@ class Note:
             return self.note_letter + str(self.octave)
 
     def to_string(self):
-        return "{0:4} | {1:10} | {3:4}".format(self.get_note(False), round(self.frequency, 6), self.cents, self.midi_ID)
+        return "{0:4} | {1:10} | {3:4}".format(self.get_note(False), round(self.frequency, 4), self.cents, self.midi_ID)
