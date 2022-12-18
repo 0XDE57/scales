@@ -5,6 +5,19 @@ import music
 import util
 
 
+# todo: dynamic fret spacing
+# frets should not be evenly spaced, but mapped according to the tonal interval
+# map interval to string length from 0-24+ frets.
+# fret | interval | length | cents
+# 0 (nut) | 2^(0/12) = 1 | = 0 | 0
+# 3 | 2^(3/12) = 1.189 | = 0.159 | 300
+# 5 | 2^(5/12) = 1.133 | = 0.251 | 500
+# 7 | 2^(7/12) = 1.498 | = 0.333 | 700
+# 12 (octave) | 2^(12/12) = 2 |  = 0.5 | 1200
+# 24 | 2^(24/12) = |  = 2 | 2400
+# ...
+
+
 class Fretboard:
     def __init__(self, window, w, h):
         self.canvas = tkinter.Canvas(window, width=w, height=h, bd=2, relief=tkinter.SOLID)
@@ -43,18 +56,19 @@ class Fretboard:
                 self.canvas.create_text(pos_x, pos_y, text=fret_note, fill=color, activefill='white')
                 if fret_note == self.triad[0]:
                     # mark root note
-                    self.canvas.create_rectangle(pos_x-radius, pos_y-radius, pos_x+radius, pos_y+radius, outline=color)
+                    self.canvas.create_rectangle(pos_x - radius, pos_y - radius, pos_x + radius, pos_y + radius,
+                                                 outline=color)
                 else:
                     # mark triad note
-                    self.canvas.create_oval(pos_x-radius, pos_y-radius, pos_x+radius, pos_y+radius, outline=color)
+                    self.canvas.create_oval(pos_x - radius, pos_y - radius, pos_x + radius, pos_y + radius,
+                                            outline=color)
             else:
                 self.canvas.create_text(pos_x, pos_y, text=fret_note, fill='#333333', activefill='white')
 
             # show frequency
             if self.show_freq:
                 fret_frequency = str(round(music.note_map[fret_note + str(fret_oct)].frequency))
-                self.canvas.create_text(pos_x, pos_y+7, text=fret_frequency, font=("Purisa", 9), fill='white')
-
+                self.canvas.create_text(pos_x, pos_y + 7, text=fret_frequency, font=("Purisa", 9), fill='white')
 
     # draws background and frets
     def draw_fret_backing(self, x):
@@ -69,10 +83,9 @@ class Fretboard:
             # highlight frets
             if fret in self.fret_marking:
                 self.canvas.create_rectangle(
-                    pos_x - self.fret_spacing/2,
-                    0,
-                    pos_x + self.fret_spacing/2,
-                    height, fill='#999999')
+                    pos_x - self.fret_spacing / 2, 0,
+                    pos_x + self.fret_spacing / 2, height,
+                    fill='#999999')
 
             # draw fret number
             self.canvas.create_text(pos_x, self.string_spacing * 7, text=fret, fill='#007777')
@@ -80,8 +93,8 @@ class Fretboard:
     # draws fretboard with guitar strings and notes
     def draw(self):
         # get the triad from the scale
-        #triad = music.get_triad(music.cur_scale.index(triad_root_note), music.cur_scale)
-        #print('drawing: ' + triad_root_note + ' -> ' + str(triad))
+        # triad = music.get_triad(music.cur_scale.index(triad_root_note), music.cur_scale)
+        # print('drawing: ' + triad_root_note + ' -> ' + str(triad))
         # print('in key: ' + str(music.cur_scale))
         x = 20
 
