@@ -174,6 +174,8 @@ tk_labelframe_piano_group.pack()
 # TODO:
 # [ ] embed pyplot instead?
 #       - https://matplotlib.org/gallery/user_interfaces/embedding_in_tk_canvas_sgskip.html
+#     or. glsl better render:
+#       - http://blog.hvidtfeldts.net/index.php/2011/07/plotting-high-frequency-functions-using-a-gpu/
 # [ ] display multi-note combined wave -> sum
 # [ ] option to center frequency instead of starting from left
 # [ ] option to animate, roll the frequency
